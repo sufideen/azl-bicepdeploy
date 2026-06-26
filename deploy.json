@@ -1,0 +1,172 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/tenantDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "orgPrefix": {
+      "type": "string",
+      "defaultValue": "corp"
+    },
+    "orgDisplayName": {
+      "type": "string",
+      "defaultValue": "Contoso Holdings"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[parameters('orgPrefix')]",
+      "properties": {
+        "displayName": "[parameters('orgDisplayName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-platform', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+      ],
+      "properties": {
+        "displayName": "Platform",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-connectivity', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+      ],
+      "properties": {
+        "displayName": "Connectivity (Hub Networks, Firewalls)",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-identity', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+      ],
+      "properties": {
+        "displayName": "Identity (Active Directory, Key Vaults)",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-management', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+      ],
+      "properties": {
+        "displayName": "Management (Log Analytics, Automation)",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-platform', parameters('orgPrefix')))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-workloads', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+      ],
+      "properties": {
+        "displayName": "Workloads",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-production', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-workloads', parameters('orgPrefix')))]"
+      ],
+      "properties": {
+        "displayName": "Production Application Environments",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-workloads', parameters('orgPrefix')))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-nonprod', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-workloads', parameters('orgPrefix')))]"
+      ],
+      "properties": {
+        "displayName": "Non-Production / Testing Environments",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', format('{0}-workloads', parameters('orgPrefix')))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-sandbox', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+      ],
+      "properties": {
+        "displayName": "Sandbox (Developer Playgrounds)",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Management/managementGroups",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}-decommissioned', parameters('orgPrefix'))]",
+      "dependsOn": [
+        "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+      ],
+      "properties": {
+        "displayName": "Decommissioned / Legacy Resources",
+        "details": {
+          "parent": {
+            "id": "[tenantResourceId('Microsoft.Management/managementGroups', parameters('orgPrefix'))]"
+          }
+        }
+      }
+    }
+  ]
+}
