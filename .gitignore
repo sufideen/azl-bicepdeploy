@@ -1,0 +1,13 @@
+# Local environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# Bicep parameters with actual secret values
+*.psat
+*.secret.bicepdefaults
+.azure/
+
+# OS metadata
+.DS_Store
+Thumbs.db
