@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -13,9 +16,11 @@ jobs:
   validate_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Checkout the Bicep code from GitHub
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2. Log in to Azure safely using passwordless OIDC
       - name: Azure Login via OIDC
         uses: azure/login@v2
         with:
@@ -23,9 +28,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # 3. Pre-Flight Check: Run a Lint test to catch syntax errors
       - name: Run Bicep Lint Check
         run: az bicep build --file ./network.bicep
 
+      # 4. Dry-Run (What-If): Show exactly what changes will happen in Azure
       - name: Azure Deployment Dry-Run (What-If)
         uses: azure/arm-deploy@v2
         with:
@@ -35,3 +42,13 @@ jobs:
           template: ./network.bicep
           additionalArguments: --what-if
 
+      # 5. Live Production Deploy (Only executes on a direct push/merge event to main)
+      - name: Deploy Hub Infrastructure
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          region: westeurope
+          template: ./network.bicep
+          failOnStdErr: false
