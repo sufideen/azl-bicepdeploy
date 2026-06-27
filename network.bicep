@@ -47,4 +47,4 @@ module hubNetwork 'br/public:avm/res/network/virtual-network:0.5.1' = {
   }
 }
 
-output hubVnetId string = hubNetwork.outputs.resourceId
+output hubVnetId string = hubNetwork.outputs.resourceId# Network topology maintenance update
