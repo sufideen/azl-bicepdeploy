@@ -1,39 +1,54 @@
-// This template deploys resources into a specific Resource Group
-targetScope = 'resourceGroup'
+targetScope = 'subscription'
 
-@description('The name of the Log Analytics Workspace.')
+@description('Name of the resource group that will hold the shared logging resources.')
+param resourceGroupName string = 'rg-ict-management-shared'
+
+@description('Azure region for all resources.')
+param location string = 'westeurope'
+
+@description('Name of the Log Analytics Workspace.')
 param workspaceName string = 'log-ict-poc-shared'
 
-@description('The Azure region where the workspace will be deployed.')
-param location string = resourceGroup().location
-
-@description('Number of days to retain log data. 30 days is the minimum and most cost-effective for PoCs.')
-@allowed([
-  30
-  60
-  90
-  120
-])
+@description('Number of days to retain log data. 30 days is the minimum; increase for regulated workloads.')
+@allowed([30, 60, 90, 120])
 param retentionInDays int = 30
 
-@description('The pricing tier SKU. PerGB2018 is the standard Pay-As-You-Go model.')
+@description('Log Analytics pricing tier.')
+@allowed(['PerGB2018', 'CapacityReservation'])
 param skuName string = 'PerGB2018'
 
-// Deploy the Log Analytics Workspace
-resource logWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: workspaceName
+// ── Resource Group ────────────────────────────────────────────────────────────
+
+resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+  name: resourceGroupName
   location: location
-  properties: {
-    sku: {
-      name: skuName
-    }
-    retentionInDays: retentionInDays
-    features: {
-      enableLogAccessUsingOnlyResourcePermissions: true
-    }
+  tags: {
+    layer: 'platform'
+    component: 'logging'
+    managedBy: 'bicep'
   }
 }
 
-// Output the Workspace ID so other resources (like Firewalls or VMs) can reference it later
-output workspaceId string = logWorkspace.id
-output workspaceCustomerId string = logWorkspace.properties.customerId
+// ── Log Analytics Workspace (deployed as a module scoped to the new RG) ───────
+
+module logWorkspace './modules/log-workspace.bicep' = {
+  name: 'log-workspace-deployment'
+  scope: rg
+  params: {
+    workspaceName: workspaceName
+    location: location
+    retentionInDays: retentionInDays
+    skuName: skuName
+  }
+}
+
+// ── Outputs ───────────────────────────────────────────────────────────────────
+
+@description('Full resource ID of the Log Analytics Workspace.')
+output workspaceId string = logWorkspace.outputs.workspaceId
+
+@description('Workspace GUID for agent and diagnostic setting references.')
+output workspaceCustomerId string = logWorkspace.outputs.workspaceCustomerId
+
+@description('Resource group that holds the logging resources.')
+output resourceGroupName string = rg.name

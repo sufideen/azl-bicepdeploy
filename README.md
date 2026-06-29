@@ -75,14 +75,15 @@ The VNet outputs `hubVnetId` — consumed by spoke VNet peering modules in downs
 
 ![CI/CD Pipeline](docs/cicd-pipeline.svg)
 
-A two-stage GitHub Actions pipeline handles both validation and deployment:
+A three-job GitHub Actions pipeline handles validation and sequential deployment across all four Azure scopes:
 
-| Trigger | Stages executed |
-|:---|:---|
-| Pull Request to `main` | Checkout → OIDC Login → Bicep Lint → What-If (no live changes) |
-| Push / Merge to `main` | Checkout → OIDC Login → Bicep Lint → What-If → **Live Deploy** |
+| Job | Trigger | What runs |
+|:---|:---|:---|
+| **Lint** | Every push & PR | `az bicep build` on all 5 Bicep files — no credentials needed |
+| **Validate** | Every push & PR (needs Lint) | `what-if` dry-run on all 4 deployment scopes |
+| **Deploy** | Push to `main` only (needs Validate) | Live deployment: Tenant → MG → Subscription (Logging) → Subscription (Network) |
 
-This pattern ensures every pull request undergoes a safe dry-run before any infrastructure change reaches Azure.
+Every pull request runs Lint + Validate before any merge. The `production` environment gate on the Deploy job allows optional manual approval to be configured in GitHub repository settings.
 
 ---
 
@@ -209,6 +210,7 @@ Navigate to **Settings → Secrets and variables → Actions** and add:
 | `AZURE_CLIENT_ID` | App Registration Client ID from Phase B |
 | `AZURE_TENANT_ID` | Microsoft Entra Tenant ID |
 | `AZURE_SUBSCRIPTION_ID` | Target Azure Subscription ID |
+| `AZURE_MANAGEMENT_GROUP_ID` | Target Management Group ID for governance policies (e.g. `corp-workloads`) |
 
 ### Phase E — Deploy the Tenant Foundation
 
@@ -249,7 +251,7 @@ A green checkmark confirms that your Bicep files compiled, passed lint, complete
 azl-bicepdeploy/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml          # GitHub Actions CI/CD pipeline
+│       └── deploy.yml                     # 3-job pipeline: Lint → Validate → Deploy
 ├── docs/
 │   ├── architecture-overview.svg          # Full ALZ scope diagram
 │   ├── management-group-hierarchy.svg     # MG tree diagram
@@ -260,12 +262,21 @@ azl-bicepdeploy/
 │       ├── azure-portal-vnet.svg          # Screenshot placeholder
 │       ├── azure-portal-policy.svg        # Screenshot placeholder
 │       └── azure-portal-log-analytics.svg # Screenshot placeholder
-├── deploy.json                 # Tenant: Management Group hierarchy
-├── governance.bicep            # Management Group: Policy assignment
-├── logging.bicep               # Resource Group: Log Analytics Workspace
-├── network.bicep               # Subscription: Hub VNet & subnets
+├── modules/
+│   └── log-workspace.bicep                # Reusable Log Analytics module (resourceGroup scope)
+├── parameters/
+│   ├── deploy.bicepparam                  # Params for deploy.bicep
+│   ├── governance.bicepparam              # Params for governance.bicep
+│   ├── logging.bicepparam                 # Params for logging.bicep
+│   └── network.bicepparam                 # Params for network.bicep
+├── bicepconfig.json            # Bicep linting rules & AVM module alias
+├── deploy.bicep                # Tenant scope: Management Group hierarchy (10 nodes)
+├── deploy.json                 # Legacy ARM template (superseded by deploy.bicep)
+├── governance.bicep            # Management Group scope: Policy assignment
+├── logging.bicep               # Subscription scope: RG + Log Analytics Workspace
+├── network.bicep               # Subscription scope: RG + Hub VNet & subnets
 ├── credential.json             # OIDC federated credential template
-├── .env.example                # Environment variable reference
+├── .env.example                # Environment variable reference (4 secrets)
 ├── SECURITY.md                 # Security policy & vulnerability reporting
 └── LICENSE                     # GNU General Public License v3
 ```

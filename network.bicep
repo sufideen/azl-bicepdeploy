@@ -12,6 +12,11 @@ param vnetAddressSpace string = '10.0.0.0/22'
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: resourceGroupName
   location: location
+  tags: {
+    layer: 'platform'
+    component: 'connectivity'
+    managedBy: 'bicep'
+  }
 }
 
 module hubNetwork 'br/public:avm/res/network/virtual-network:0.5.1' = {
