@@ -11,6 +11,8 @@ A fully automated, **production-aligned Azure Landing Zone (ALZ)** infrastructur
 
 ## Architecture Overview
 
+> Full diagram and screenshot gallery: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+
 ![Architecture Overview](docs/architecture-overview.svg)
 
 This blueprint spans **four distinct Azure deployment scopes**, enforcing governance, platform operations, and enterprise networking from a single GitOps pipeline:
