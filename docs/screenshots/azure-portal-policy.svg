@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="800" height="420" fill="#faf9f8" rx="10"/>
+  <rect width="800" height="48" fill="#0078d4" rx="10"/>
+  <rect x="0" y="38" width="800" height="10" fill="#0078d4"/>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="white">⬡ Microsoft Azure</text>
+  <rect x="200" y="12" width="320" height="24" rx="4" fill="#006cc1"/>
+  <text x="360" y="29" text-anchor="middle" font-size="10" fill="#cce5ff">Search resources, services, and docs</text>
+
+  <text x="20" y="70" font-size="11" fill="#0078d4">Home  ›  Policy  ›  Assignments</text>
+  <text x="20" y="100" font-size="18" font-weight="bold" fill="#323130">Policy Assignments</text>
+  <text x="20" y="118" font-size="11" fill="#605e5c">Management group: ict-workloads</text>
+
+  <rect x="0" y="128" width="800" height="1" fill="#edebe9"/>
+
+  <!-- Filter bar -->
+  <rect x="20" y="140" width="200" height="28" rx="4" fill="white" stroke="#8a8886" stroke-width="1"/>
+  <text x="35" y="159" font-size="10" fill="#605e5c">Filter by name...</text>
+  <rect x="240" y="140" width="120" height="28" rx="4" fill="white" stroke="#8a8886" stroke-width="1"/>
+  <text x="255" y="159" font-size="10" fill="#605e5c">Compliance state</text>
+
+  <!-- Table header -->
+  <rect x="20" y="180" width="760" height="28" fill="#f3f2f1"/>
+  <text x="30" y="199" font-size="10" font-weight="bold" fill="#323130">Assignment name</text>
+  <text x="280" y="199" font-size="10" font-weight="bold" fill="#323130">Scope</text>
+  <text x="460" y="199" font-size="10" font-weight="bold" fill="#323130">Compliance state</text>
+  <text x="600" y="199" font-size="10" font-weight="bold" fill="#323130">Effect</text>
+
+  <!-- Assignment row 1 -->
+  <rect x="20" y="208" width="760" height="40" fill="white"/>
+  <text x="30" y="224" font-size="11" fill="#0078d4">Enforce Regional Data Residency Guardrails</text>
+  <text x="30" y="240" font-size="9" fill="#605e5c">alz-allowed-locations</text>
+  <text x="280" y="232" font-size="10" fill="#323130">ict-workloads (MG)</text>
+  <rect x="460" y="218" width="100" height="20" rx="4" fill="#dff6dd"/>
+  <text x="510" y="232" text-anchor="middle" font-size="10" font-weight="bold" fill="#107c10">● Compliant</text>
+  <text x="600" y="232" font-size="10" fill="#323130">Deny</text>
+
+  <!-- Assignment detail panel -->
+  <rect x="20" y="264" width="760" height="120" rx="6" fill="white" stroke="#edebe9" stroke-width="1"/>
+  <text x="40" y="286" font-size="12" font-weight="bold" fill="#323130">Assignment details — alz-allowed-locations</text>
+  <rect x="40" y="294" width="720" height="1" fill="#edebe9"/>
+
+  <text x="40" y="314" font-size="10" fill="#605e5c">Policy definition</text>
+  <text x="220" y="314" font-size="10" fill="#0078d4">Allowed locations (Built-in)</text>
+  <text x="560" y="314" font-size="10" fill="#605e5c">Definition ID</text>
+  <text x="640" y="314" font-size="10" fill="#323130">e56962a6-4747-49cd-b67b...</text>
+
+  <text x="40" y="334" font-size="10" fill="#605e5c">Allowed locations</text>
+  <rect x="220" y="322" width="80" height="18" rx="3" fill="#dff6dd" stroke="#107c10" stroke-width="1"/>
+  <text x="260" y="335" text-anchor="middle" font-size="9" fill="#107c10">westeurope</text>
+  <rect x="308" y="322" width="56" height="18" rx="3" fill="#dff6dd" stroke="#107c10" stroke-width="1"/>
+  <text x="336" y="335" text-anchor="middle" font-size="9" fill="#107c10">uksouth</text>
+
+  <text x="40" y="358" font-size="10" fill="#605e5c">Enforcement mode</text>
+  <text x="220" y="358" font-size="10" fill="#323130">Default (Enforce)</text>
+  <text x="40" y="378" font-size="10" fill="#605e5c">Description</text>
+  <text x="220" y="378" font-size="10" fill="#323130">Restricts resource deployments strictly to approved enterprise regions.</text>
+
+  <rect x="0" y="396" width="800" height="24" fill="#9e6a03" opacity="0.9"/>
+  <text x="400" y="412" text-anchor="middle" font-size="11" font-weight="bold" fill="white">📸 Placeholder — Replace with actual Azure Policy screenshot</text>
+</svg>

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="800" height="420" fill="#faf9f8" rx="10"/>
+  <!-- Azure Portal top bar -->
+  <rect width="800" height="48" fill="#0078d4" rx="10"/>
+  <rect x="0" y="38" width="800" height="10" fill="#0078d4"/>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="white">⬡ Microsoft Azure</text>
+  <rect x="200" y="12" width="320" height="24" rx="4" fill="#006cc1"/>
+  <text x="360" y="29" text-anchor="middle" font-size="10" fill="#cce5ff">Search resources, services, and docs</text>
+
+  <!-- Breadcrumb -->
+  <text x="20" y="70" font-size="11" fill="#0078d4">Home  ›  Virtual networks  ›  vnet-ict-hub-prod</text>
+
+  <!-- Page title -->
+  <text x="20" y="100" font-size="18" font-weight="bold" fill="#323130">vnet-ict-hub-prod</text>
+  <text x="20" y="118" font-size="11" fill="#605e5c">Virtual network  ·  rg-ict-connectivity-prod  ·  West Europe</text>
+
+  <!-- Tabs -->
+  <rect x="0" y="128" width="800" height="1" fill="#edebe9"/>
+  <text x="20" y="148" font-size="12" fill="#0078d4" font-weight="bold">Overview</text>
+  <rect x="20" y="150" width="64" height="2" fill="#0078d4"/>
+  <text x="100" y="148" font-size="12" fill="#605e5c">Address space</text>
+  <text x="210" y="148" font-size="12" fill="#605e5c">Connected devices</text>
+  <text x="350" y="148" font-size="12" fill="#605e5c">Subnets</text>
+  <text x="410" y="148" font-size="12" fill="#605e5c">Peerings</text>
+
+  <!-- Essentials grid -->
+  <rect x="20" y="160" width="760" height="100" rx="4" fill="white" stroke="#edebe9" stroke-width="1"/>
+  <text x="40" y="182" font-size="10" fill="#605e5c">Resource group</text>
+  <text x="40" y="198" font-size="11" font-weight="bold" fill="#0078d4">rg-ict-connectivity-prod</text>
+
+  <text x="200" y="182" font-size="10" fill="#605e5c">Location</text>
+  <text x="200" y="198" font-size="11" fill="#323130">West Europe</text>
+
+  <text x="360" y="182" font-size="10" fill="#605e5c">Address space</text>
+  <text x="360" y="198" font-size="11" fill="#323130">10.0.0.0/22</text>
+
+  <text x="520" y="182" font-size="10" fill="#605e5c">DNS servers</text>
+  <text x="520" y="198" font-size="11" fill="#323130">Azure-provided</text>
+
+  <text x="40" y="224" font-size="10" fill="#605e5c">Subnets</text>
+  <text x="40" y="240" font-size="11" fill="#323130">4</text>
+  <text x="200" y="224" font-size="10" fill="#605e5c">Connected devices</text>
+  <text x="200" y="240" font-size="11" fill="#323130">0 (ready for deployment)</text>
+  <text x="520" y="224" font-size="10" fill="#605e5c">Subscription</text>
+  <text x="520" y="240" font-size="11" fill="#0078d4">ict-platform-connectivity</text>
+
+  <!-- Subnets table -->
+  <text x="20" y="284" font-size="13" font-weight="bold" fill="#323130">Subnets</text>
+  <rect x="20" y="292" width="760" height="28" rx="0" fill="#f3f2f1"/>
+  <text x="30" y="311" font-size="10" font-weight="bold" fill="#323130">Name</text>
+  <text x="280" y="311" font-size="10" font-weight="bold" fill="#323130">Address range</text>
+  <text x="420" y="311" font-size="10" font-weight="bold" fill="#323130">Available IPs</text>
+  <text x="540" y="311" font-size="10" font-weight="bold" fill="#323130">Delegations</text>
+
+  <rect x="20" y="320" width="760" height="24" fill="white"/>
+  <text x="30" y="336" font-size="10" fill="#0078d4">AzureFirewallSubnet</text>
+  <text x="280" y="336" font-size="10" fill="#323130">10.0.0.0/24</text>
+  <text x="420" y="336" font-size="10" fill="#323130">251</text>
+  <text x="540" y="336" font-size="10" fill="#605e5c">None</text>
+
+  <rect x="20" y="344" width="760" height="24" fill="#faf9f8"/>
+  <text x="30" y="360" font-size="10" fill="#0078d4">GatewaySubnet</text>
+  <text x="280" y="360" font-size="10" fill="#323130">10.0.1.0/24</text>
+  <text x="420" y="360" font-size="10" fill="#323130">251</text>
+  <text x="540" y="360" font-size="10" fill="#605e5c">None</text>
+
+  <rect x="20" y="368" width="760" height="24" fill="white"/>
+  <text x="30" y="384" font-size="10" fill="#0078d4">AzureBastionSubnet</text>
+  <text x="280" y="384" font-size="10" fill="#323130">10.0.2.0/24</text>
+  <text x="420" y="384" font-size="10" fill="#323130">251</text>
+  <text x="540" y="384" font-size="10" fill="#605e5c">None</text>
+
+  <!-- Placeholder banner -->
+  <rect x="0" y="396" width="800" height="24" fill="#9e6a03" opacity="0.9"/>
+  <text x="400" y="412" text-anchor="middle" font-size="11" font-weight="bold" fill="white">📸 Placeholder — Replace with actual Azure Portal VNet screenshot</text>
+</svg>

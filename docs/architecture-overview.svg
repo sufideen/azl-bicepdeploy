@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" font-family="Segoe UI, Arial, sans-serif">
+
+  <!-- Background -->
+  <rect width="900" height="720" fill="#f4f6f9" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a2e">Azure Landing Zone — Multi-Scope GitOps Architecture</text>
+  <text x="450" y="58" text-anchor="middle" font-size="12" fill="#666">Bicep + GitHub Actions + OIDC · sufideen/azl-bicepdeploy</text>
+
+  <!-- ── LAYER 1: TENANT ── -->
+  <rect x="60" y="80" width="780" height="90" rx="8" fill="#0078d4" opacity="0.12" stroke="#0078d4" stroke-width="1.5"/>
+  <text x="80" y="100" font-size="10" font-weight="bold" fill="#0078d4" text-transform="uppercase">TENANT SCOPE  ·  deploy.json</text>
+  <rect x="80" y="108" width="180" height="48" rx="6" fill="#0078d4" opacity="0.85"/>
+  <text x="170" y="128" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Root Management</text>
+  <text x="170" y="144" text-anchor="middle" font-size="10" fill="#cce5ff">Group Hierarchy</text>
+  <text x="310" y="135" text-anchor="middle" font-size="11" fill="#333">10 Management Groups: Corp → Platform → Connectivity /</text>
+  <text x="310" y="151" text-anchor="middle" font-size="11" fill="#333">Identity / Management → Workloads → Prod / Non-Prod / Sandbox</text>
+
+  <!-- arrow down -->
+  <line x1="450" y1="170" x2="450" y2="192" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="445,192 455,192 450,200" fill="#888"/>
+
+  <!-- ── LAYER 2: MANAGEMENT GROUP ── -->
+  <rect x="60" y="200" width="780" height="90" rx="8" fill="#107c10" opacity="0.10" stroke="#107c10" stroke-width="1.5"/>
+  <text x="80" y="220" font-size="10" font-weight="bold" fill="#107c10">MANAGEMENT GROUP SCOPE  ·  governance.bicep</text>
+  <rect x="80" y="228" width="180" height="48" rx="6" fill="#107c10" opacity="0.85"/>
+  <text x="170" y="248" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Azure Policy</text>
+  <text x="170" y="264" text-anchor="middle" font-size="10" fill="#c5e8c5">Assignment</text>
+  <text x="310" y="248" text-anchor="middle" font-size="11" fill="#333">alz-allowed-locations — Restricts deployments to</text>
+  <text x="310" y="264" text-anchor="middle" font-size="11" fill="#333">westeurope &amp; uksouth (GDPR data residency guardrail)</text>
+
+  <!-- arrow down -->
+  <line x1="450" y1="290" x2="450" y2="312" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="445,312 455,312 450,320" fill="#888"/>
+
+  <!-- ── LAYER 3: SUBSCRIPTION ── -->
+  <rect x="60" y="320" width="780" height="110" rx="8" fill="#8661c5" opacity="0.10" stroke="#8661c5" stroke-width="1.5"/>
+  <text x="80" y="340" font-size="10" font-weight="bold" fill="#8661c5">SUBSCRIPTION SCOPE  ·  network.bicep</text>
+  <rect x="80" y="348" width="180" height="68" rx="6" fill="#8661c5" opacity="0.85"/>
+  <text x="170" y="370" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Hub Virtual Network</text>
+  <text x="170" y="386" text-anchor="middle" font-size="10" fill="#e8d8ff">vnet-ict-hub-prod</text>
+  <text x="170" y="400" text-anchor="middle" font-size="10" fill="#e8d8ff">10.0.0.0/22</text>
+
+  <!-- Subnet boxes -->
+  <rect x="285" y="348" width="118" height="32" rx="4" fill="#8661c5" opacity="0.6"/>
+  <text x="344" y="362" text-anchor="middle" font-size="9" font-weight="bold" fill="white">AzureFirewallSubnet</text>
+  <text x="344" y="374" text-anchor="middle" font-size="9" fill="#f0e8ff">10.0.0.0/24</text>
+
+  <rect x="412" y="348" width="118" height="32" rx="4" fill="#8661c5" opacity="0.6"/>
+  <text x="471" y="362" text-anchor="middle" font-size="9" font-weight="bold" fill="white">GatewaySubnet</text>
+  <text x="471" y="374" text-anchor="middle" font-size="9" fill="#f0e8ff">10.0.1.0/24</text>
+
+  <rect x="539" y="348" width="118" height="32" rx="4" fill="#8661c5" opacity="0.6"/>
+  <text x="598" y="362" text-anchor="middle" font-size="9" font-weight="bold" fill="white">AzureBastionSubnet</text>
+  <text x="598" y="374" text-anchor="middle" font-size="9" fill="#f0e8ff">10.0.2.0/24</text>
+
+  <rect x="666" y="348" width="152" height="32" rx="4" fill="#8661c5" opacity="0.6"/>
+  <text x="742" y="362" text-anchor="middle" font-size="9" font-weight="bold" fill="white">snet-shared-management</text>
+  <text x="742" y="374" text-anchor="middle" font-size="9" fill="#f0e8ff">10.0.3.0/24</text>
+
+  <!-- Service labels row -->
+  <text x="344" y="406" text-anchor="middle" font-size="9" fill="#555">🔥 Azure Firewall</text>
+  <text x="471" y="406" text-anchor="middle" font-size="9" fill="#555">🔗 VPN / ExpressRoute</text>
+  <text x="598" y="406" text-anchor="middle" font-size="9" fill="#555">🛡 Bastion Host</text>
+  <text x="742" y="406" text-anchor="middle" font-size="9" fill="#555">⚙ Management Tools</text>
+
+  <!-- arrow down -->
+  <line x1="450" y1="430" x2="450" y2="452" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="445,452 455,452 450,460" fill="#888"/>
+
+  <!-- ── LAYER 4: RESOURCE GROUP ── -->
+  <rect x="60" y="460" width="780" height="90" rx="8" fill="#d83b01" opacity="0.10" stroke="#d83b01" stroke-width="1.5"/>
+  <text x="80" y="480" font-size="10" font-weight="bold" fill="#d83b01">RESOURCE GROUP SCOPE  ·  logging.bicep</text>
+  <rect x="80" y="488" width="180" height="48" rx="6" fill="#d83b01" opacity="0.85"/>
+  <text x="170" y="508" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Log Analytics</text>
+  <text x="170" y="524" text-anchor="middle" font-size="10" fill="#ffd9cc">Workspace</text>
+  <text x="310" y="508" text-anchor="middle" font-size="11" fill="#333">log-ict-poc-shared · PerGB2018 · 30-day retention</text>
+  <text x="310" y="524" text-anchor="middle" font-size="11" fill="#333">RBAC-only access · Ready for Microsoft Sentinel</text>
+
+  <!-- ── CI/CD PANEL ── -->
+  <rect x="60" y="572" width="780" height="118" rx="8" fill="#1a1a2e" opacity="0.06" stroke="#1a1a2e" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="80" y="592" font-size="10" font-weight="bold" fill="#1a1a2e">CI/CD ENGINE  ·  .github/workflows/deploy.yml</text>
+
+  <!-- Pipeline steps -->
+  <rect x="80"  y="600" width="110" height="48" rx="6" fill="#24292e"/>
+  <text x="135" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">git push</text>
+  <text x="135" y="636" text-anchor="middle" font-size="9" fill="#aaa">→ main branch</text>
+
+  <text x="202" y="628" text-anchor="middle" font-size="14" fill="#555">→</text>
+
+  <rect x="214" y="600" width="110" height="48" rx="6" fill="#0078d4"/>
+  <text x="269" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">OIDC Login</text>
+  <text x="269" y="636" text-anchor="middle" font-size="9" fill="#cce5ff">Passwordless</text>
+
+  <text x="336" y="628" text-anchor="middle" font-size="14" fill="#555">→</text>
+
+  <rect x="348" y="600" width="110" height="48" rx="6" fill="#107c10"/>
+  <text x="403" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Bicep Lint</text>
+  <text x="403" y="636" text-anchor="middle" font-size="9" fill="#c5e8c5">Syntax check</text>
+
+  <text x="470" y="628" text-anchor="middle" font-size="14" fill="#555">→</text>
+
+  <rect x="482" y="600" width="110" height="48" rx="6" fill="#8661c5"/>
+  <text x="537" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">What-If</text>
+  <text x="537" y="636" text-anchor="middle" font-size="9" fill="#f0e8ff">Dry run preview</text>
+
+  <text x="604" y="628" text-anchor="middle" font-size="14" fill="#555">→</text>
+
+  <rect x="616" y="600" width="110" height="48" rx="6" fill="#d83b01"/>
+  <text x="671" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Deploy</text>
+  <text x="671" y="636" text-anchor="middle" font-size="9" fill="#ffd9cc">Push to main only</text>
+
+  <text x="738" y="628" text-anchor="middle" font-size="14" fill="#555">→</text>
+
+  <rect x="750" y="600" width="78" height="48" rx="6" fill="#107c10"/>
+  <text x="789" y="620" text-anchor="middle" font-size="10" font-weight="bold" fill="white">✅ Done</text>
+  <text x="789" y="636" text-anchor="middle" font-size="9" fill="#c5e8c5">Azure live</text>
+
+  <!-- Footer -->
+  <text x="450" y="708" text-anchor="middle" font-size="10" fill="#999">Azure Landing Zone · Hub-and-Spoke · GitOps · Enterprise IaC Blueprint</text>
+
+</svg>
