@@ -1,0 +1,123 @@
+name: "Azure ALZ — Tenant Foundation (Management Groups)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PURPOSE
+# Deploys the Management Group hierarchy (deploy.bicep) at TENANT scope.
+# This is a one-time / infrequent setup operation, separate from the main
+# deploy.yml which handles day-to-day governance, logging, and networking.
+#
+# ELEVATED PERMISSION REQUIREMENT
+# Tenant-scope deployments require the OIDC Service Principal to have
+# Owner (or a custom role with Microsoft.Resources/deployments/write)
+# at the TENANT ROOT scope (/), not just the root Management Group.
+#
+# To grant this, a Global Administrator must run:
+#
+#   az role assignment create \
+#     --assignee "<YOUR_SP_OBJECT_ID>" \
+#     --role "Owner" \
+#     --scope "/"
+#
+# This is a higher privilege than the root Management Group Owner grant
+# documented in the main README. Run this command once, then trigger
+# this workflow manually or push a change to deploy.bicep.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  # Manual trigger — run from the GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run What-If only (no live changes)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+  # Auto-trigger only when the tenant templates themselves change
+  push:
+    branches: [main]
+    paths:
+      - 'deploy.bicep'
+      - 'parameters/deploy.bicepparam'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_REGION: westeurope
+
+jobs:
+  lint:
+    name: "Bicep Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Bicep CLI
+        run: az bicep install
+
+      - name: Lint — deploy.bicep
+        run: az bicep build --file ./deploy.bicep
+
+  validate:
+    name: "What-If Validation (Tenant)"
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Bicep CLI
+        run: az bicep install
+
+      - name: "What-If — Management Group Hierarchy (Tenant)"
+        run: |
+          az deployment tenant what-if \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./deploy.bicep \
+            --parameters ./parameters/deploy.bicepparam \
+            --no-prompt
+
+  deploy:
+    name: "Deploy Management Groups (Tenant)"
+    needs: validate
+    # Skip live deploy if this was triggered as a dry run
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'false')
+    runs-on: ubuntu-latest
+    environment: tenant-setup
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Bicep CLI
+        run: az bicep install
+
+      - name: "Deploy Management Group Hierarchy (Tenant)"
+        run: |
+          az deployment tenant create \
+            --name "alz-mgmt-groups-${{ github.run_number }}" \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./deploy.bicep \
+            --parameters ./parameters/deploy.bicepparam \
+            --no-prompt

@@ -77,15 +77,25 @@ The VNet outputs `hubVnetId` — consumed by spoke VNet peering modules in downs
 
 ![CI/CD Pipeline](docs/cicd-pipeline.svg)
 
-A three-job GitHub Actions pipeline handles validation and sequential deployment across all four Azure scopes:
+Two GitHub Actions workflows handle the full ALZ deployment lifecycle:
+
+**`deploy.yml`** — runs on every push and PR (day-to-day operations):
 
 | Job | Trigger | What runs |
 |:---|:---|:---|
-| **Lint** | Every push & PR | `az bicep build` on all 5 Bicep files — no credentials needed |
-| **Validate** | Every push & PR (needs Lint) | `what-if` dry-run on all 4 deployment scopes |
-| **Deploy** | Push to `main` only (needs Validate) | Live deployment: Tenant → MG → Subscription (Logging) → Subscription (Network) |
+| **Lint** | Every push & PR | `az bicep build` on all 5 Bicep files — no Azure credentials needed |
+| **Validate** | Every push & PR (needs Lint) | `what-if` across Management Group + both Subscription deployments |
+| **Deploy** | Push to `main` only (needs Validate) | Live: Governance Policy → Logging → Hub Network |
 
-Every pull request runs Lint + Validate before any merge. The `production` environment gate on the Deploy job allows optional manual approval to be configured in GitHub repository settings.
+**`deploy-tenant.yml`** — tenant-scope Management Group hierarchy (infrequent, elevated permissions):
+
+| Job | Trigger | What runs |
+|:---|:---|:---|
+| **Lint** | On `deploy.bicep` change or manual | `az bicep build` on `deploy.bicep` |
+| **Validate** | Same (needs Lint) | `az deployment tenant what-if` |
+| **Deploy** | Manual with `dry_run=false` or push to `deploy.bicep` | `az deployment tenant create` — Management Groups |
+
+> **Why two pipelines?** Tenant-scope deployments require `Owner` at `/` (tenant root) — a Global Administrator grant separate from the root Management Group. Separating it avoids `AuthorizationFailed` errors on routine PR validation while keeping the tenant foundation deployable when needed.
 
 ---
 
@@ -184,12 +194,21 @@ az ad app create --display-name "github-actions-alz-deploy"
 # Create a Service Principal for the new Application ID
 az ad sp create --id "YOUR_AZURE_CLIENT_ID"
 
-# Grant Owner at the root Management Group scope
+# Grant Owner at the root Management Group scope (for governance, logging, and network deployments)
 az role assignment create \
   --assignee "YOUR_AZURE_CLIENT_ID" \
   --role "Owner" \
   --scope "/providers/Microsoft.Management/managementGroups/YOUR_ROOT_MANAGEMENT_GROUP_ID"
+
+# Grant Owner at the tenant root scope (required ONLY for deploy-tenant.yml — Management Group creation)
+# This must be run by a Global Administrator
+az role assignment create \
+  --assignee "YOUR_AZURE_CLIENT_ID" \
+  --role "Owner" \
+  --scope "/"
 ```
+
+> **Note on the two-scope grants:** Day-to-day deployments (governance policy, logging, networking) only require the Management Group Owner grant. The tenant root `/` grant is needed solely for `deploy-tenant.yml` which provisions the Management Group hierarchy — a one-time setup operation.
 
 ### Phase C — OIDC Trust Relationship
 
