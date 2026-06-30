@@ -266,6 +266,22 @@ A green checkmark confirms that your Bicep files compiled, passed lint, complete
 
 ---
 
+## Spinning Up On Demand
+
+`scripts/startup.sh` redeploys the same three live-deploy stages as `deploy.yml`'s `deploy` job (Governance → Logging → Network) directly via the Azure CLI, without needing to push to `main` or wait on CI:
+
+```bash
+# Preview what would be deployed (az what-if, no changes made)
+./scripts/startup.sh
+
+# Actually deploy
+./scripts/startup.sh --yes
+```
+
+Requires the same `az login` / OIDC permissions used by the deploy pipelines.
+
+---
+
 ## Tearing Down
 
 The deployed resources are low-cost (an empty VNet, an unused Log Analytics workspace, and a free policy assignment — no Firewall, Bastion, or Gateway is deployed), but `scripts/teardown.sh` gives a fast way to remove them between demos:
@@ -310,6 +326,7 @@ azl-bicepdeploy/
 │   ├── logging.bicepparam                 # Params for logging.bicep
 │   └── network.bicepparam                 # Params for network.bicep
 ├── scripts/
+│   ├── startup.sh               # Redeploys Governance → Logging → Network (dry-run by default)
 │   └── teardown.sh             # Removes deployed billable resources (dry-run by default)
 ├── bicepconfig.json            # Bicep linting rules & AVM module alias
 ├── deploy.bicep                # Tenant scope: Management Group hierarchy (10 nodes)
