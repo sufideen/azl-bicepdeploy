@@ -45,6 +45,9 @@ jobs:
       - name: Lint — modules/activity-log-diagnostics.bicep
         run: az bicep build --file ./modules/activity-log-diagnostics.bicep
 
+      - name: Lint — modules/security-solution.bicep
+        run: az bicep build --file ./modules/security-solution.bicep
+
       - name: Lint — modules/security-events-dcr.bicep
         run: az bicep build --file ./modules/security-events-dcr.bicep
 

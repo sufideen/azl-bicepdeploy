@@ -54,6 +54,20 @@ module activityLogDiagnostics './modules/activity-log-diagnostics.bicep' = {
 }
 
 // ── Data Sources: Windows Security Events ──────────────────────────────────────
+// Onboards the Security solution first — it provisions the SecurityEvent table
+// that the DCR's Microsoft-SecurityEvent output stream requires. The DCR fails
+// with InvalidOutputTable if this hasn't run yet.
+
+module securitySolution './modules/security-solution.bicep' = {
+  name: 'security-solution-deployment'
+  scope: rg
+  params: {
+    workspaceName: logWorkspace.outputs.workspaceName
+    location: location
+    workspaceId: logWorkspace.outputs.workspaceId
+  }
+}
+
 // Creates the Data Collection Rule used by the Azure Monitor Agent. Associate
 // it with VMs separately (Microsoft.Insights/dataCollectionRuleAssociations)
 // to start ingesting Windows security events into this workspace.
@@ -66,6 +80,9 @@ module securityEventsDcr './modules/security-events-dcr.bicep' = {
     workspaceId: logWorkspace.outputs.workspaceId
     workspaceName: logWorkspace.outputs.workspaceName
   }
+  dependsOn: [
+    securitySolution
+  ]
 }
 
 // ── Outputs ───────────────────────────────────────────────────────────────────
