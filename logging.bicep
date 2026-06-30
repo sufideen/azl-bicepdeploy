@@ -42,6 +42,32 @@ module logWorkspace './modules/log-workspace.bicep' = {
   }
 }
 
+// ── Data Sources: Azure Activity Log ───────────────────────────────────────────
+// Connects the subscription's Activity Log to the workspace so it appears as a
+// "Connected" data source instead of the placeholder "Next step" state.
+
+module activityLogDiagnostics './modules/activity-log-diagnostics.bicep' = {
+  name: 'activity-log-diagnostics-deployment'
+  params: {
+    workspaceId: logWorkspace.outputs.workspaceId
+  }
+}
+
+// ── Data Sources: Windows Security Events ──────────────────────────────────────
+// Creates the Data Collection Rule used by the Azure Monitor Agent. Associate
+// it with VMs separately (Microsoft.Insights/dataCollectionRuleAssociations)
+// to start ingesting Windows security events into this workspace.
+
+module securityEventsDcr './modules/security-events-dcr.bicep' = {
+  name: 'security-events-dcr-deployment'
+  scope: rg
+  params: {
+    location: location
+    workspaceId: logWorkspace.outputs.workspaceId
+    workspaceName: logWorkspace.outputs.workspaceName
+  }
+}
+
 // ── Outputs ───────────────────────────────────────────────────────────────────
 
 @description('Full resource ID of the Log Analytics Workspace.')
@@ -52,3 +78,9 @@ output workspaceCustomerId string = logWorkspace.outputs.workspaceCustomerId
 
 @description('Resource group that holds the logging resources.')
 output resourceGroupName string = rg.name
+
+@description('Resource ID of the subscription Activity Log diagnostic setting.')
+output activityLogDiagnosticSettingId string = activityLogDiagnostics.outputs.diagnosticSettingId
+
+@description('Resource ID of the Windows Security Events Data Collection Rule.')
+output securityEventsDcrId string = securityEventsDcr.outputs.dcrId
