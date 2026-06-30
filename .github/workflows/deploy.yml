@@ -42,6 +42,30 @@ jobs:
       - name: Lint — modules/log-workspace.bicep
         run: az bicep build --file ./modules/log-workspace.bicep
 
+      - name: Lint — modules/activity-log-diagnostics.bicep
+        run: az bicep build --file ./modules/activity-log-diagnostics.bicep
+
+      - name: Lint — modules/security-solution.bicep
+        run: az bicep build --file ./modules/security-solution.bicep
+
+      - name: Lint — modules/security-events-dcr.bicep
+        run: az bicep build --file ./modules/security-events-dcr.bicep
+
+      - name: Lint — modules/vm-monitoring-onboarding.bicep
+        run: az bicep build --file ./modules/vm-monitoring-onboarding.bicep
+
+      - name: Lint — vm-onboarding.bicep (Subscription)
+        run: az bicep build --file ./vm-onboarding.bicep
+
+      - name: Lint — modules/test-vm.bicep
+        run: az bicep build --file ./modules/test-vm.bicep
+
+      - name: Lint — modules/subnet-id-lookup.bicep
+        run: az bicep build --file ./modules/subnet-id-lookup.bicep
+
+      - name: Lint — test-vm-deploy.bicep (Subscription)
+        run: az bicep build --file ./test-vm-deploy.bicep
+
       - name: Lint — network.bicep (Subscription)
         run: az bicep build --file ./network.bicep
 
