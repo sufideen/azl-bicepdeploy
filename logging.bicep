@@ -17,6 +17,9 @@ param retentionInDays int = 30
 @allowed(['PerGB2018', 'CapacityReservation'])
 param skuName string = 'PerGB2018'
 
+@description('Deploy the Windows Security Events DCR. Leave false on the first run — the SecurityEvent table takes a few minutes to provision after the Security solution is onboarded, and the DCR fails with InvalidOutputTable if it does not exist yet. Re-run with this set to true once the table is confirmed.')
+param deploySecurityEventsDcr bool = false
+
 // ── Resource Group ────────────────────────────────────────────────────────────
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
@@ -70,9 +73,10 @@ module securitySolution './modules/security-solution.bicep' = {
 
 // Creates the Data Collection Rule used by the Azure Monitor Agent. Associate
 // it with VMs separately (Microsoft.Insights/dataCollectionRuleAssociations)
-// to start ingesting Windows security events into this workspace.
+// to start ingesting Windows security events into this workspace. Gated by
+// deploySecurityEventsDcr — see param description.
 
-module securityEventsDcr './modules/security-events-dcr.bicep' = {
+module securityEventsDcr './modules/security-events-dcr.bicep' = if (deploySecurityEventsDcr) {
   name: 'security-events-dcr-deployment'
   scope: rg
   params: {
@@ -99,5 +103,5 @@ output resourceGroupName string = rg.name
 @description('Resource ID of the subscription Activity Log diagnostic setting.')
 output activityLogDiagnosticSettingId string = activityLogDiagnostics.outputs.diagnosticSettingId
 
-@description('Resource ID of the Windows Security Events Data Collection Rule.')
-output securityEventsDcrId string = securityEventsDcr.outputs.dcrId
+@description('Resource ID of the Windows Security Events Data Collection Rule. Empty until deploySecurityEventsDcr=true is deployed.')
+output securityEventsDcrId string = deploySecurityEventsDcr ? securityEventsDcr.outputs.dcrId : ''
