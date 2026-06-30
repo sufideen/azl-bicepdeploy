@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" width="860" height="520" font-family="Segoe UI, Arial, sans-serif">
+
+  <rect width="860" height="520" fill="#f4f6f9" rx="12"/>
+
+  <text x="430" y="36" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a1a2e">Management Group Hierarchy</text>
+  <text x="430" y="55" text-anchor="middle" font-size="11" fill="#666">deploy.json · Tenant Scope · 10 Management Groups</text>
+
+  <!-- ── ROOT ── -->
+  <rect x="330" y="72" width="200" height="44" rx="8" fill="#0078d4"/>
+  <text x="430" y="91" text-anchor="middle" font-size="12" font-weight="bold" fill="white">corp</text>
+  <text x="430" y="108" text-anchor="middle" font-size="10" fill="#cce5ff">Contoso Holdings (Root)</text>
+
+  <!-- Root → Platform connector -->
+  <line x1="430" y1="116" x2="430" y2="134" stroke="#0078d4" stroke-width="1.5"/>
+  <!-- Root → Workloads connector -->
+  <line x1="430" y1="116" x2="430" y2="122" stroke="#0078d4" stroke-width="1.5"/>
+  <line x1="222" y1="122" x2="638" y2="122" stroke="#0078d4" stroke-width="1.5"/>
+
+  <!-- Root → Sandbox -->
+  <line x1="172" y1="122" x2="172" y2="134" stroke="#0078d4" stroke-width="1.5"/>
+  <!-- Root → Decommissioned -->
+  <line x1="688" y1="122" x2="688" y2="134" stroke="#0078d4" stroke-width="1.5"/>
+
+  <!-- Adjust horizontal bar -->
+  <line x1="172" y1="122" x2="688" y2="122" stroke="#0078d4" stroke-width="1.5"/>
+
+  <!-- ── PLATFORM ── -->
+  <rect x="330" y="134" width="200" height="44" rx="8" fill="#106ebe"/>
+  <text x="430" y="153" text-anchor="middle" font-size="12" font-weight="bold" fill="white">corp-platform</text>
+  <text x="430" y="169" text-anchor="middle" font-size="10" fill="#cce5ff">Platform</text>
+
+  <!-- Platform → 3 children -->
+  <line x1="430" y1="178" x2="430" y2="196" stroke="#106ebe" stroke-width="1.5"/>
+  <line x1="222" y1="196" x2="638" y2="196" stroke="#106ebe" stroke-width="1.5"/>
+  <line x1="222" y1="196" x2="222" y2="210" stroke="#106ebe" stroke-width="1.5"/>
+  <line x1="430" y1="196" x2="430" y2="210" stroke="#106ebe" stroke-width="1.5"/>
+  <line x1="638" y1="196" x2="638" y2="210" stroke="#106ebe" stroke-width="1.5"/>
+
+  <!-- corp-connectivity -->
+  <rect x="122" y="210" width="200" height="52" rx="8" fill="#2b88d8"/>
+  <text x="222" y="232" text-anchor="middle" font-size="11" font-weight="bold" fill="white">corp-connectivity</text>
+  <text x="222" y="248" text-anchor="middle" font-size="9" fill="#cce5ff">Hub Networks</text>
+  <text x="222" y="260" text-anchor="middle" font-size="9" fill="#cce5ff">Firewalls · Gateways</text>
+
+  <!-- corp-identity -->
+  <rect x="330" y="210" width="200" height="52" rx="8" fill="#2b88d8"/>
+  <text x="430" y="232" text-anchor="middle" font-size="11" font-weight="bold" fill="white">corp-identity</text>
+  <text x="430" y="248" text-anchor="middle" font-size="9" fill="#cce5ff">Active Directory</text>
+  <text x="430" y="260" text-anchor="middle" font-size="9" fill="#cce5ff">Key Vaults</text>
+
+  <!-- corp-management -->
+  <rect x="538" y="210" width="200" height="52" rx="8" fill="#2b88d8"/>
+  <text x="638" y="232" text-anchor="middle" font-size="11" font-weight="bold" fill="white">corp-management</text>
+  <text x="638" y="248" text-anchor="middle" font-size="9" fill="#cce5ff">Log Analytics</text>
+  <text x="638" y="260" text-anchor="middle" font-size="9" fill="#cce5ff">Automation</text>
+
+  <!-- ── WORKLOADS ── -->
+  <line x1="430" y1="122" x2="430" y2="122" stroke="#107c10" stroke-width="0"/>
+  <!-- Separate branch from root -->
+  <!-- Workloads box is at y=310 -->
+  <line x1="430" y1="122" x2="430" y2="310" stroke="#107c10" stroke-width="0"/>
+
+  <!-- draw workloads branch from the horizontal line at y=122 -->
+  <!-- Already connected. Let's draw corp-workloads at center -->
+
+  <!-- Corp workloads vertical from horizontal bar y=122, centre x=430 was used for platform. -->
+  <!-- We need a second level. Let me reposition. Workloads branch comes from root. -->
+  <!-- Root is at x=430, I'll add another row for workloads -->
+
+  <!-- vertical from root (bottom y=116) to a branch point, then down to workloads -->
+  <!-- Already drawn branch from y=122. The horizontal bar connects 172..688 -->
+  <!-- platform is at x=430 -->
+  <!-- sandbox is at x=172 -->
+  <!-- decommissioned is at x=688 -->
+  <!-- workloads: put at x=430, but below... let's use a different x -->
+  <!-- Actually let me simplify: workloads at x=430 is col 2, below platform means we need extra row -->
+  <!-- Redraw: Workloads as second child of root at y=310, connected via longer line from root's horizontal -->
+
+  <!-- The root horizontal line at y=122 has points at x=172, 430, 638... I need workloads too -->
+  <!-- Let me place workloads between platform and decommissioned: use x=430 for platform/workloads column -->
+  <!-- This SVG already has platform at x=430; I'll put workloads at same x but different y, with separate connector from root -->
+
+  <!-- vertical line from root bottom to workloads, going right of platform to avoid overlap -->
+  <!-- Use a separate column. Workloads at x=430, y=310 with connector coming from root via a path -->
+
+  <!-- Simple approach: extend the diagram. Corp → Workloads via direct line from root bottom at (430,116) going down to workloads at y=308 BUT bypassing platform. Use a side path. -->
+  <!-- Let's just add it clearly with a label showing the parent is root. -->
+
+  <!-- ── WORKLOADS (child of root) ── -->
+  <text x="430" y="298" text-anchor="middle" font-size="9" fill="#107c10" font-style="italic">↓ child of corp (root)</text>
+  <rect x="330" y="308" width="200" height="44" rx="8" fill="#107c10"/>
+  <text x="430" y="327" text-anchor="middle" font-size="12" font-weight="bold" fill="white">corp-workloads</text>
+  <text x="430" y="343" text-anchor="middle" font-size="10" fill="#c5e8c5">Workloads</text>
+
+  <!-- Workloads → 2 children -->
+  <line x1="430" y1="352" x2="430" y2="370" stroke="#107c10" stroke-width="1.5"/>
+  <line x1="340" y1="370" x2="520" y2="370" stroke="#107c10" stroke-width="1.5"/>
+  <line x1="340" y1="370" x2="340" y2="384" stroke="#107c10" stroke-width="1.5"/>
+  <line x1="520" y1="370" x2="520" y2="384" stroke="#107c10" stroke-width="1.5"/>
+
+  <!-- corp-production -->
+  <rect x="240" y="384" width="200" height="52" rx="8" fill="#00b294"/>
+  <text x="340" y="406" text-anchor="middle" font-size="11" font-weight="bold" fill="white">corp-production</text>
+  <text x="340" y="422" text-anchor="middle" font-size="9" fill="#d0fff6">Production Application</text>
+  <text x="340" y="436" text-anchor="middle" font-size="9" fill="#d0fff6">Environments</text>
+
+  <!-- corp-nonprod -->
+  <rect x="420" y="384" width="200" height="52" rx="8" fill="#00b294"/>
+  <text x="520" y="406" text-anchor="middle" font-size="11" font-weight="bold" fill="white">corp-nonprod</text>
+  <text x="520" y="422" text-anchor="middle" font-size="9" fill="#d0fff6">Non-Production /</text>
+  <text x="520" y="436" text-anchor="middle" font-size="9" fill="#d0fff6">Testing Environments</text>
+
+  <!-- ── SANDBOX (child of root) ── -->
+  <rect x="72" y="134" width="200" height="44" rx="8" fill="#ca5010"/>
+  <text x="172" y="153" text-anchor="middle" font-size="12" font-weight="bold" fill="white">corp-sandbox</text>
+  <text x="172" y="169" text-anchor="middle" font-size="10" fill="#ffd9cc">Developer Playgrounds</text>
+
+  <!-- ── DECOMMISSIONED (child of root) ── -->
+  <rect x="588" y="134" width="200" height="44" rx="8" fill="#605e5c"/>
+  <text x="688" y="153" text-anchor="middle" font-size="12" font-weight="bold" fill="white">corp-decommissioned</text>
+  <text x="688" y="169" text-anchor="middle" font-size="10" fill="#e8e8e8">Legacy Resources</text>
+
+  <!-- Legend -->
+  <rect x="60" y="460" width="740" height="44" rx="8" fill="white" opacity="0.7"/>
+  <rect x="80" y="472" width="14" height="14" rx="3" fill="#0078d4"/>
+  <text x="100" y="483" font-size="10" fill="#333">Root / Tenant</text>
+  <rect x="200" y="472" width="14" height="14" rx="3" fill="#2b88d8"/>
+  <text x="220" y="483" font-size="10" fill="#333">Platform Services</text>
+  <rect x="340" y="472" width="14" height="14" rx="3" fill="#107c10"/>
+  <text x="360" y="483" font-size="10" fill="#333">Workloads</text>
+  <rect x="450" y="472" width="14" height="14" rx="3" fill="#00b294"/>
+  <text x="470" y="483" font-size="10" fill="#333">Environments</text>
+  <rect x="560" y="472" width="14" height="14" rx="3" fill="#ca5010"/>
+  <text x="580" y="483" font-size="10" fill="#333">Sandbox</text>
+  <rect x="650" y="472" width="14" height="14" rx="3" fill="#605e5c"/>
+  <text x="670" y="483" font-size="10" fill="#333">Decommissioned</text>
+
+  <text x="430" y="510" text-anchor="middle" font-size="10" fill="#999">sufideen/azl-bicepdeploy · deploy.json</text>
+
+</svg>

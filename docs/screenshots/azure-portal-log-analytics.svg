@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="800" height="420" fill="#faf9f8" rx="10"/>
+  <rect width="800" height="48" fill="#0078d4" rx="10"/>
+  <rect x="0" y="38" width="800" height="10" fill="#0078d4"/>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="white">⬡ Microsoft Azure</text>
+  <rect x="200" y="12" width="320" height="24" rx="4" fill="#006cc1"/>
+  <text x="360" y="29" text-anchor="middle" font-size="10" fill="#cce5ff">Search resources, services, and docs</text>
+
+  <text x="20" y="70" font-size="11" fill="#0078d4">Home  ›  Log Analytics workspaces  ›  log-ict-poc-shared</text>
+  <text x="20" y="100" font-size="18" font-weight="bold" fill="#323130">log-ict-poc-shared</text>
+  <text x="20" y="118" font-size="11" fill="#605e5c">Log Analytics workspace  ·  West Europe</text>
+
+  <rect x="0" y="128" width="800" height="1" fill="#edebe9"/>
+
+  <!-- Essentials -->
+  <rect x="20" y="140" width="760" height="90" rx="4" fill="white" stroke="#edebe9" stroke-width="1"/>
+  <text x="40" y="162" font-size="10" fill="#605e5c">Resource group</text>
+  <text x="40" y="178" font-size="11" fill="#0078d4">rg-ict-management-shared</text>
+  <text x="240" y="162" font-size="10" fill="#605e5c">Location</text>
+  <text x="240" y="178" font-size="11" fill="#323130">West Europe</text>
+  <text x="400" y="162" font-size="10" fill="#605e5c">SKU</text>
+  <text x="400" y="178" font-size="11" fill="#323130">PerGB2018</text>
+  <text x="560" y="162" font-size="10" fill="#605e5c">Retention (days)</text>
+  <text x="560" y="178" font-size="11" fill="#323130">30</text>
+
+  <text x="40" y="206" font-size="10" fill="#605e5c">Workspace ID</text>
+  <text x="40" y="220" font-size="10" fill="#323130">a3f2e1d0-xxxx-xxxx-xxxx-xxxxxxxxxxxx</text>
+  <text x="400" y="206" font-size="10" fill="#605e5c">Access control mode</text>
+  <text x="400" y="220" font-size="10" fill="#323130">Use resource or workspace permissions</text>
+
+  <!-- Charts area mockup -->
+  <rect x="20" y="244" width="370" height="130" rx="6" fill="white" stroke="#edebe9" stroke-width="1"/>
+  <text x="40" y="264" font-size="11" font-weight="bold" fill="#323130">Log volume (last 30 days)</text>
+  <!-- Bar chart bars (decorative) -->
+  <rect x="40"  y="330" width="14" height="24" fill="#0078d4" opacity="0.7"/>
+  <rect x="62"  y="315" width="14" height="39" fill="#0078d4" opacity="0.7"/>
+  <rect x="84"  y="322" width="14" height="32" fill="#0078d4" opacity="0.7"/>
+  <rect x="106" y="308" width="14" height="46" fill="#0078d4" opacity="0.7"/>
+  <rect x="128" y="318" width="14" height="36" fill="#0078d4" opacity="0.7"/>
+  <rect x="150" y="300" width="14" height="54" fill="#0078d4" opacity="0.7"/>
+  <rect x="172" y="310" width="14" height="44" fill="#0078d4" opacity="0.7"/>
+  <rect x="194" y="295" width="14" height="59" fill="#0078d4" opacity="0.7"/>
+  <rect x="216" y="303" width="14" height="51" fill="#0078d4" opacity="0.7"/>
+  <rect x="238" y="285" width="14" height="69" fill="#0078d4" opacity="0.7"/>
+  <rect x="260" y="296" width="14" height="58" fill="#0078d4" opacity="0.7"/>
+  <rect x="282" y="278" width="14" height="76" fill="#0078d4" opacity="0.7"/>
+  <rect x="304" y="289" width="14" height="65" fill="#0078d4" opacity="0.7"/>
+  <rect x="326" y="270" width="14" height="84" fill="#0078d4" opacity="0.7"/>
+  <rect x="348" y="280" width="14" height="74" fill="#0078d4" opacity="0.7"/>
+
+  <rect x="410" y="244" width="370" height="130" rx="6" fill="white" stroke="#edebe9" stroke-width="1"/>
+  <text x="430" y="264" font-size="11" font-weight="bold" fill="#323130">Connected data sources</text>
+  <text x="430" y="290" font-size="10" fill="#605e5c">Windows security events</text>
+  <rect x="680" y="278" width="80" height="16" rx="4" fill="#dff6dd"/>
+  <text x="720" y="290" text-anchor="middle" font-size="9" fill="#107c10">● Ready</text>
+  <text x="430" y="314" font-size="10" fill="#605e5c">Azure Activity logs</text>
+  <rect x="680" y="302" width="80" height="16" rx="4" fill="#dff6dd"/>
+  <text x="720" y="314" text-anchor="middle" font-size="9" fill="#107c10">● Connected</text>
+  <text x="430" y="338" font-size="10" fill="#605e5c">Microsoft Sentinel</text>
+  <rect x="680" y="326" width="80" height="16" rx="4" fill="#fff4ce"/>
+  <text x="720" y="338" text-anchor="middle" font-size="9" fill="#9e6a03">◎ Next step</text>
+  <text x="430" y="362" font-size="10" fill="#605e5c">Defender for Cloud</text>
+  <rect x="680" y="350" width="80" height="16" rx="4" fill="#fff4ce"/>
+  <text x="720" y="362" text-anchor="middle" font-size="9" fill="#9e6a03">◎ Next step</text>
+
+  <rect x="0" y="396" width="800" height="24" fill="#9e6a03" opacity="0.9"/>
+  <text x="400" y="412" text-anchor="middle" font-size="11" font-weight="bold" fill="white">📸 Placeholder — Replace with actual Log Analytics screenshot</text>
+</svg>

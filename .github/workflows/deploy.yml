@@ -1,26 +1,61 @@
 name: "Azure ALZ GitOps Deployment"
 
+# Deploys: Governance (Management Group) + Logging + Network (Subscription)
+# Tenant-scope management group hierarchy is handled separately by deploy-tenant.yml
+# because it requires Owner at the tenant root (/), not just the root Management Group.
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   id-token: write
   contents: read
 
+env:
+  AZURE_REGION: westeurope
+
+# ── Job 1: Lint ───────────────────────────────────────────────────────────────
+# Validates Bicep syntax for every template. No Azure credentials required.
 jobs:
-  validate_and_deploy:
+  lint:
+    name: "Bicep Lint"
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout the Bicep code from GitHub
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Log in to Azure safely using passwordless OIDC
+      - name: Install Bicep CLI
+        run: az bicep install
+
+      - name: Lint — deploy.bicep (Tenant)
+        run: az bicep build --file ./deploy.bicep
+
+      - name: Lint — governance.bicep (Management Group)
+        run: az bicep build --file ./governance.bicep
+
+      - name: Lint — logging.bicep (Subscription)
+        run: az bicep build --file ./logging.bicep
+
+      - name: Lint — modules/log-workspace.bicep
+        run: az bicep build --file ./modules/log-workspace.bicep
+
+      - name: Lint — network.bicep (Subscription)
+        run: az bicep build --file ./network.bicep
+
+# ── Job 2: Validate (What-If) ─────────────────────────────────────────────────
+# Dry-run across Management Group and Subscription scopes.
+# Tenant scope is excluded — requires Owner at / (see deploy-tenant.yml).
+  validate:
+    name: "What-If Validation"
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Azure Login via OIDC
         uses: azure/login@v2
         with:
@@ -28,27 +63,81 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # 3. Pre-Flight Check: Run a Lint test to catch syntax errors
-      - name: Run Bicep Lint Check
-        run: az bicep build --file ./network.bicep
+      - name: Install Bicep CLI
+        run: az bicep install
 
-      # 4. Dry-Run (What-If): Show exactly what changes will happen in Azure
-      - name: Azure Deployment Dry-Run (What-If)
-        uses: azure/arm-deploy@v2
-        with:
-          scope: subscription
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          region: westeurope
-          template: ./network.bicep
-          additionalArguments: --what-if
+      - name: "What-If — Stage 1: Governance Policies (Management Group)"
+        run: |
+          az deployment mg what-if \
+            --management-group-id ${{ secrets.AZURE_MANAGEMENT_GROUP_ID }} \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./governance.bicep \
+            --parameters ./parameters/governance.bicepparam \
+            --no-prompt
 
-      # 5. Live Production Deploy (Only executes on a direct push/merge event to main)
-      - name: Deploy Hub Infrastructure
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: azure/arm-deploy@v2
+      - name: "What-If — Stage 2: Platform Logging (Subscription)"
+        run: |
+          az deployment sub what-if \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./logging.bicep \
+            --parameters ./parameters/logging.bicepparam \
+            --no-prompt
+
+      - name: "What-If — Stage 3: Hub Network (Subscription)"
+        run: |
+          az deployment sub what-if \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./network.bicep \
+            --parameters ./parameters/network.bicepparam \
+            --no-prompt
+
+# ── Job 3: Deploy ─────────────────────────────────────────────────────────────
+# Live deployment — runs ONLY on push/merge to main (not on PRs).
+# Stages are sequential: Management Group → Subscription (Logging) → Subscription (Network).
+  deploy:
+    name: "Deploy ALZ"
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
         with:
-          scope: subscription
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          region: westeurope
-          template: ./network.bicep
-          failOnStdErr: false
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Bicep CLI
+        run: az bicep install
+
+      - name: "Stage 1 — Deploy Governance Policies (Management Group)"
+        run: |
+          az deployment mg create \
+            --name "alz-governance-${{ github.run_number }}" \
+            --management-group-id ${{ secrets.AZURE_MANAGEMENT_GROUP_ID }} \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./governance.bicep \
+            --parameters ./parameters/governance.bicepparam \
+            --no-prompt
+
+      - name: "Stage 2 — Deploy Platform Logging (Subscription)"
+        run: |
+          az deployment sub create \
+            --name "alz-logging-${{ github.run_number }}" \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./logging.bicep \
+            --parameters ./parameters/logging.bicepparam \
+            --no-prompt
+
+      - name: "Stage 3 — Deploy Hub Network (Subscription)"
+        run: |
+          az deployment sub create \
+            --name "alz-network-${{ github.run_number }}" \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./network.bicep \
+            --parameters ./parameters/network.bicepparam \
+            --no-prompt
