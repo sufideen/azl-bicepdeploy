@@ -12,8 +12,8 @@
 
 targetScope = 'resourceGroup'
 
-@description('Name of the test VM. Keep it identifiable so it is easy to find and delete later.')
-param vmName string = 'vm-loganalytics-test'
+@description('Name of the test VM. Keep it identifiable so it is easy to find and delete later. Windows computer names must be 15 characters or fewer, which is why this is shorter than you might expect.')
+param vmName string = 'vm-la-test'
 
 @description('Azure region. Inherits from the parent resource group when omitted.')
 param location string = resourceGroup().location

@@ -12,8 +12,8 @@ param subnetName string = 'snet-shared-management'
 @description('Azure region. Should match the region of the target subnet.')
 param location string = 'westeurope'
 
-@description('Name of the test VM.')
-param vmName string = 'vm-loganalytics-test'
+@description('Name of the test VM. Windows computer names must be 15 characters or fewer.')
+param vmName string = 'vm-la-test'
 
 @description('Local administrator username for the test VM.')
 param adminUsername string = 'azureadmin'
