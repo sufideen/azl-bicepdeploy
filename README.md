@@ -132,7 +132,9 @@ See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability re
 
 ### Azure Portal — Log Analytics Workspace
 
-![Azure Portal Log Analytics](docs/screenshots/azure-portal-log-analytics.svg)
+![Azure Portal Log Analytics](docs/screenshots/log-ict-poc-shared.png)
+
+![Azure Portal Log Analytics Query Results](docs/screenshots/log-ict-poc-shared02.png)
 
 ---
 
@@ -282,7 +284,8 @@ azl-bicepdeploy/
 │       ├── github-actions-run.svg         # Screenshot placeholder
 │       ├── azure-portal-vnet.png          # Hub VNet screenshot
 │       ├── azure-portal-policy.png        # Policy assignment screenshot
-│       └── azure-portal-log-analytics.svg # Screenshot placeholder
+│       ├── log-ict-poc-shared.png         # Log Analytics workspace screenshot
+│       └── log-ict-poc-shared02.png       # Log Analytics query results screenshot
 ├── modules/
 │   └── log-workspace.bicep                # Reusable Log Analytics module (resourceGroup scope)
 ├── parameters/

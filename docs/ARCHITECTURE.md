@@ -105,7 +105,9 @@ Shows the `alz-allowed-locations` policy assignment at management group scope wi
 
 Shows `log-ict-poc-shared` in the Azure Portal with SKU, retention period, and connected data sources.
 
-![Azure Portal — Log Analytics](./screenshots/azure-portal-log-analytics.svg)
+![Azure Portal — Log Analytics](./screenshots/log-ict-poc-shared.png)
+
+![Azure Portal — Log Analytics Query Results](./screenshots/log-ict-poc-shared02.png)
 
 ---
 
@@ -120,4 +122,5 @@ Shows `log-ict-poc-shared` in the Azure Portal with SKU, retention period, and c
 | `screenshots/github-actions-run.svg` | Live pipeline execution | `.github/workflows/deploy.yml` |
 | `screenshots/azure-portal-vnet.png` | Deployed hub VNet | `network.bicep` |
 | `screenshots/azure-portal-policy.png` | Active policy assignment | `governance.bicep` |
-| `screenshots/azure-portal-log-analytics.svg` | Deployed workspace | `logging.bicep` + `modules/log-workspace.bicep` |
+| `screenshots/log-ict-poc-shared.png` | Deployed workspace + live SecurityEvent query results | `logging.bicep` + `modules/log-workspace.bicep` |
+| `screenshots/log-ict-poc-shared02.png` | Deployed workspace + live SecurityEvent query results | `logging.bicep` + `modules/log-workspace.bicep` |
