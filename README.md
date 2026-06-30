@@ -116,7 +116,7 @@ See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability re
 
 ## Screenshots
 
-> **Note:** The remaining placeholders below will be replaced with real screenshots as the platform is deployed further.
+> **Note:** All screenshots below are from the live deployed platform, except the GitHub Actions run, which is a mockup modeled on a real pipeline run.
 
 ### GitHub Actions — Successful Pipeline Run
 
