@@ -77,9 +77,11 @@ Three-job GitHub Actions pipeline. Lint runs without Azure credentials. Validate
 
 ### GitHub Actions — Successful Pipeline Run
 
-Shows all five pipeline steps (Checkout, OIDC Login, Lint, What-If, Deploy) passing with green checkmarks.
+Shows the three-job pipeline (Bicep Lint, What-If Validation, Deploy ALZ) passing with green checkmarks, each staged across Management Group, Subscription, and Hub Network scopes.
 
 ![GitHub Actions Run](./screenshots/github-actions-run.svg)
+
+See the real run: [Azure ALZ GitOps Deployment #28455413091](https://github.com/sufideen/azl-bicepdeploy/actions/runs/28455413091)
 
 ---
 
