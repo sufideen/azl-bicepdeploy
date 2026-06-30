@@ -60,6 +60,9 @@ jobs:
       - name: Lint — modules/test-vm.bicep
         run: az bicep build --file ./modules/test-vm.bicep
 
+      - name: Lint — modules/subnet-id-lookup.bicep
+        run: az bicep build --file ./modules/subnet-id-lookup.bicep
+
       - name: Lint — test-vm-deploy.bicep (Subscription)
         run: az bicep build --file ./test-vm-deploy.bicep
 

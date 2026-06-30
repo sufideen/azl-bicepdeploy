@@ -31,13 +31,22 @@ resource targetRg 'Microsoft.Resources/resourceGroups@2024-03-01' existing = {
   name: vnetResourceGroupName
 }
 
+module subnetLookup './modules/subnet-id-lookup.bicep' = {
+  name: 'subnet-id-lookup-deployment'
+  scope: targetRg
+  params: {
+    vnetName: vnetName
+    subnetName: subnetName
+  }
+}
+
 module testVm './modules/test-vm.bicep' = {
   name: 'log-analytics-test-vm-deployment'
   scope: targetRg
   params: {
     vmName: vmName
     location: location
-    subnetId: resourceId(vnetResourceGroupName, 'Microsoft.Network/virtualNetworks/subnets', vnetName, subnetName)
+    subnetId: subnetLookup.outputs.subnetId
     adminUsername: adminUsername
     adminPassword: adminPassword
     dataCollectionRuleId: dataCollectionRuleId
