@@ -116,11 +116,11 @@ See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability re
 
 ## Screenshots
 
-> **Note:** All screenshots below are from the live deployed platform, except the GitHub Actions run, which is a mockup modeled on a real pipeline run.
+> **Note:** All screenshots below are from the live deployed platform.
 
 ### GitHub Actions — Successful Pipeline Run
 
-![GitHub Actions Run](docs/screenshots/github-actions-run.svg)
+![GitHub Actions Run](docs/screenshots/github-actions-run.png)
 
 Real run: [Azure ALZ GitOps Deployment #28455413091](https://github.com/sufideen/azl-bicepdeploy/actions/runs/28455413091)
 
@@ -283,7 +283,7 @@ azl-bicepdeploy/
 │   ├── hub-network-topology.svg           # Hub VNet subnet diagram
 │   ├── cicd-pipeline.svg                  # Pipeline flow diagram
 │   └── screenshots/
-│       ├── github-actions-run.svg         # Pipeline run mockup (based on real run #28455413091)
+│       ├── github-actions-run.png         # Real GitHub Actions pipeline run screenshot
 │       ├── azure-portal-vnet.png          # Hub VNet screenshot
 │       ├── azure-portal-policy.png        # Policy assignment screenshot
 │       ├── log-ict-poc-shared.png         # Log Analytics workspace screenshot

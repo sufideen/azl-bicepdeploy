@@ -73,13 +73,13 @@ Three-job GitHub Actions pipeline. Lint runs without Azure credentials. Validate
 
 ## Screenshots
 
-> All screenshots below are from the live deployed platform, except the GitHub Actions run, which is a mockup modeled on a real pipeline run (`.svg`, since pipeline UI changes over time). To refresh it, take a new screenshot → save as `.png` → replace `docs/screenshots/github-actions-run.svg` → commit. Both `.png` and `.svg` are supported by GitHub Markdown rendering.
+> All screenshots below are from the live deployed platform.
 
 ### GitHub Actions — Successful Pipeline Run
 
 Shows the three-job pipeline (Bicep Lint, What-If Validation, Deploy ALZ) passing with green checkmarks, each staged across Management Group, Subscription, and Hub Network scopes.
 
-![GitHub Actions Run](./screenshots/github-actions-run.svg)
+![GitHub Actions Run](./screenshots/github-actions-run.png)
 
 See the real run: [Azure ALZ GitOps Deployment #28455413091](https://github.com/sufideen/azl-bicepdeploy/actions/runs/28455413091)
 
@@ -121,7 +121,7 @@ Shows `log-ict-poc-shared` in the Azure Portal with SKU, retention period, and c
 | `management-group-hierarchy.svg` | Org governance structure | `deploy.bicep` |
 | `hub-network-topology.svg` | Hub VNet subnets and services | `network.bicep` |
 | `cicd-pipeline.svg` | GitHub Actions workflow | `.github/workflows/deploy.yml` |
-| `screenshots/github-actions-run.svg` | Pipeline run mockup (modeled on run #28455413091) | `.github/workflows/deploy.yml` |
+| `screenshots/github-actions-run.png` | Live pipeline execution (run #28455413091) | `.github/workflows/deploy.yml` |
 | `screenshots/azure-portal-vnet.png` | Deployed hub VNet | `network.bicep` |
 | `screenshots/azure-portal-policy.png` | Active policy assignment | `governance.bicep` |
 | `screenshots/log-ict-poc-shared.png` | Deployed workspace + live SecurityEvent query results | `logging.bicep` + `modules/log-workspace.bicep` |
