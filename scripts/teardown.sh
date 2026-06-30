@@ -13,7 +13,7 @@
 set -euo pipefail
 
 CONNECTIVITY_RG="rg-ict-connectivity-prod"
-LOGGING_RG="rg-ict-management-shared"
+LOGGING_RG="rg-ict-management-poc"
 MANAGEMENT_GROUP_ID="${AZURE_MANAGEMENT_GROUP_ID:-corp-workloads}"
 POLICY_ASSIGNMENT_NAME="alz-allowed-locations-${MANAGEMENT_GROUP_ID}"
 

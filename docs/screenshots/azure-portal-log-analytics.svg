@@ -15,7 +15,7 @@
   <!-- Essentials -->
   <rect x="20" y="140" width="760" height="90" rx="4" fill="white" stroke="#edebe9" stroke-width="1"/>
   <text x="40" y="162" font-size="10" fill="#605e5c">Resource group</text>
-  <text x="40" y="178" font-size="11" fill="#0078d4">rg-ict-management-shared</text>
+  <text x="40" y="178" font-size="11" fill="#0078d4">rg-ict-management-poc</text>
   <text x="240" y="162" font-size="10" fill="#605e5c">Location</text>
   <text x="240" y="178" font-size="11" fill="#323130">West Europe</text>
   <text x="400" y="162" font-size="10" fill="#605e5c">SKU</text>

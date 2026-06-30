@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @description('Name of the resource group that will hold the shared logging resources.')
-param resourceGroupName string = 'rg-ict-management-shared'
+param resourceGroupName string = 'rg-ict-management-poc'
 
 @description('Azure region for all resources.')
 param location string = 'westeurope'
