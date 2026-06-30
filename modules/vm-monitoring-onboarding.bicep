@@ -21,7 +21,7 @@ resource vms 'Microsoft.Compute/virtualMachines@2024-07-01' existing = [for vmNa
 resource amaExtension 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = [for (vmName, i) in vmNames: {
   parent: vms[i]
   name: osType == 'Windows' ? 'AzureMonitorWindowsAgent' : 'AzureMonitorLinuxAgent'
-  location: vms[i].location
+  location: resourceGroup().location
   properties: {
     publisher: 'Microsoft.Azure.Monitor'
     type: osType == 'Windows' ? 'AzureMonitorWindowsAgent' : 'AzureMonitorLinuxAgent'
