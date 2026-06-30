@@ -14,7 +14,9 @@ param allowedLocations array = [
 // Effect: Deny — hard block, not audit-only.
 
 resource locationPolicyAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: 'alz-allowed-locations-${managementGroupId}'
+  // Policy assignment names are capped at 24 characters — keep this short and
+  // fixed rather than namespacing by managementGroupId.
+  name: 'alz-allowed-locations'
   scope: managementGroup()
   properties: {
     displayName: 'Enforce Regional Data Residency Guardrails'
