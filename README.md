@@ -112,6 +112,49 @@ Two GitHub Actions workflows handle the full ALZ deployment lifecycle:
 
 See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability reporting process.
 
+### Security Risks: Cloning, Forking, and Branch Access
+
+#### Forking or cloning does not grant Azure access
+
+The OIDC federated credential (`credential.json`) is hard-pinned to:
+
+```
+repo:sufideen/azl-bicepdeploy:ref:refs/heads/main
+```
+
+This means:
+- **Cloning** gives you a local copy of the files — nothing more. No Azure credentials transfer.
+- **Forking** creates your own GitHub repo. GitHub Actions in your fork cannot request a token for the *original* owner's Azure tenant — the subject claim will not match.
+- Anyone forking who wants a working pipeline must complete Phases B–C from scratch against **their own** Entra ID tenant, creating a new app registration and a new federated credential pointing at their fork.
+
+#### Feature branches cannot authenticate
+
+Even within this repository, the OIDC binding restricts token issuance to `refs/heads/main`. A workflow triggered from a PR or feature branch can run Lint and Validate (no Azure credentials required), but the Deploy job will fail with `AuthorizationFailed` — by design.
+
+#### `main` is effectively the deploy credential — protect it accordingly
+
+Because the OIDC trust is bound to `ref:refs/heads/main`, **anyone who can land a commit on `main` can trigger a deployment** with Management Group Owner permissions. A compromised maintainer account, an unreviewed PR, or a malicious edit to `.github/workflows/deploy.yml` could be used to run arbitrary `az` commands against the live Azure tenant.
+
+Recommended branch protection settings (GitHub → Settings → Branches → Add rule for `main`):
+
+| Protection | Setting |
+|:---|:---|
+| Require pull request before merging | Enabled — minimum 1 approver |
+| Require status checks to pass | `lint` and `validate` jobs |
+| Do not allow bypassing the above settings | Enabled |
+| Restrict who can push to matching branches | Named maintainers / CODEOWNERS only |
+| Allow force pushes | **Disabled** |
+
+Additionally, treat any PR that modifies `.github/workflows/*.yml` with elevated scrutiny — workflow files are the highest-value injection point in a CI/CD-based deployment pipeline.
+
+#### Do not commit real values into tracked files
+
+The `.gitignore` already excludes `.env`, `.azure/`, and `*.secret.bicepdefaults`. When experimenting locally on a fork, never hardcode your own `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, or `AZURE_SUBSCRIPTION_ID` into tracked `.bicepparam` files — use `.env` (untracked) or GitHub Actions secrets in your fork's Settings.
+
+#### Granted Azure RBAC is real and broad
+
+Completing Phase B grants the Entra app `Owner` at the root Management Group (and optionally at the tenant root `/`). This is a significant permission grant scoped to **your** Azure tenant only — it has no effect on the upstream repository's tenant. When you finish testing, delete or disable the app registration to remove the elevated access.
+
 ---
 
 ## Screenshots
@@ -173,18 +216,80 @@ This repository establishes the **platform foundation layer** of the ALZ. The fo
 
 ---
 
+## Getting the Code
+
+Choose the option that matches your goal:
+
+### Option 1 — Clone (read/inspect locally)
+
+If you just want to explore the Bicep files or run local `az bicep build` / `what-if` commands, clone the repository directly:
+
+```bash
+git clone https://github.com/sufideen/azl-bicepdeploy.git
+cd azl-bicepdeploy
+```
+
+> **Note:** A clone gives you a local read copy. You cannot push changes back to this repository unless you have write access. For your own deployable copy, use Option 2.
+
+### Option 2 — Fork then Clone (recommended for deployment)
+
+To run your own pipeline against your own Azure tenant you **must** fork first, because the OIDC trust and GitHub Actions secrets are owner-specific and must be re-created pointing at your copy of the repo:
+
+1. Click **Fork** (top-right on the GitHub repo page) — GitHub creates `your-username/azl-bicepdeploy` under your account.
+2. Clone your fork:
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/azl-bicepdeploy.git
+cd azl-bicepdeploy
+```
+
+3. Continue with the Implementation Guide below — Phases B–F set up the Azure identity and pipeline secrets **inside your fork**.
+
+### Option 3 — Download ZIP (quick inspection, no git)
+
+If you only want to browse the files without any git tooling:
+
+1. On the GitHub repo page click **Code → Download ZIP**.
+2. Extract the archive locally.
+
+> This gives you a static snapshot with no git history and no remote. You cannot run the pipeline from a ZIP — use Option 2 for deployment.
+
+### Local Environment Setup
+
+Before running any commands in the Implementation Guide, ensure the following tools are installed:
+
+| Tool | Install guide | Verify |
+|:---|:---|:---|
+| **git** | [git-scm.com](https://git-scm.com/downloads) | `git --version` |
+| **Azure CLI** | [learn.microsoft.com/cli/azure](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) | `az --version` |
+| **Bicep CLI** | Bundled with Azure CLI — run `az bicep install` to update | `az bicep version` |
+| **VS Code** *(optional but recommended)* | [code.visualstudio.com](https://code.visualstudio.com/) + install the [Bicep extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) | — |
+
+Authenticate the Azure CLI to your tenant before running any `az` commands:
+
+```bash
+az login
+az account show   # confirm the correct subscription is active
+```
+
+---
+
 ## Implementation Guide
 
 Follow these phases sequentially to build, secure, and automate the infrastructure framework.
 
-### Phase A — Local Workspace Initialization
+### Phase A — Confirm Your Local Workspace
+
+If you followed Option 2 above you already have a local clone of your fork. Verify you are on `main` and the remote points at your fork:
 
 ```bash
-git init
-git branch -M main
-git config --global user.name "your-github-username"
-git config --global user.email "your-professional-email@domain.com"
+git remote -v          # should show YOUR fork URL, not the upstream repo
+git checkout main
+git config user.name "your-github-username"
+git config user.email "your-professional-email@domain.com"
 ```
+
+> Omit `--global` to scope the git identity to this repository only.
 
 ### Phase B — Identity & Root Permissions
 
