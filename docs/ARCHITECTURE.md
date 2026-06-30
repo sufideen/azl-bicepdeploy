@@ -87,7 +87,7 @@ Shows all five pipeline steps (Checkout, OIDC Login, Lint, What-If, Deploy) pass
 
 Shows `vnet-ict-hub-prod` in the Azure Portal with address space `10.0.0.0/22` and all four subnets listed.
 
-![Azure Portal — Hub VNet](./screenshots/azure-portal-vnet.svg)
+![Azure Portal — Hub VNet](./screenshots/azure-portal-vnet.png)
 
 ---
 
@@ -95,7 +95,9 @@ Shows `vnet-ict-hub-prod` in the Azure Portal with address space `10.0.0.0/22` a
 
 Shows the `alz-allowed-locations` policy assignment at management group scope with compliance state and the two permitted regions.
 
-![Azure Portal — Policy](./screenshots/azure-portal-policy.svg)
+![Azure Portal — Policy](./screenshots/azure-portal-policy.png)
+
+![Azure Portal — Policy Detail](./screenshots/azure-portal-policy-02.png)
 
 ---
 
@@ -116,6 +118,6 @@ Shows `log-ict-poc-shared` in the Azure Portal with SKU, retention period, and c
 | `hub-network-topology.svg` | Hub VNet subnets and services | `network.bicep` |
 | `cicd-pipeline.svg` | GitHub Actions workflow | `.github/workflows/deploy.yml` |
 | `screenshots/github-actions-run.svg` | Live pipeline execution | `.github/workflows/deploy.yml` |
-| `screenshots/azure-portal-vnet.svg` | Deployed hub VNet | `network.bicep` |
-| `screenshots/azure-portal-policy.svg` | Active policy assignment | `governance.bicep` |
+| `screenshots/azure-portal-vnet.png` | Deployed hub VNet | `network.bicep` |
+| `screenshots/azure-portal-policy.png` | Active policy assignment | `governance.bicep` |
 | `screenshots/azure-portal-log-analytics.svg` | Deployed workspace | `logging.bicep` + `modules/log-workspace.bicep` |

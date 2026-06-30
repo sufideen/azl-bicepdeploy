@@ -116,7 +116,7 @@ See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability re
 
 ## Screenshots
 
-> **Note:** Replace each placeholder below with an actual screenshot after deploying to your Azure tenant.
+> **Note:** The remaining placeholders below will be replaced with real screenshots as the platform is deployed further.
 
 ### GitHub Actions — Successful Pipeline Run
 
@@ -124,11 +124,11 @@ See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability re
 
 ### Azure Portal — Hub Virtual Network
 
-![Azure Portal VNet](docs/screenshots/azure-portal-vnet.svg)
+![Azure Portal VNet](docs/screenshots/azure-portal-vnet.png)
 
 ### Azure Portal — Policy Assignment
 
-![Azure Portal Policy](docs/screenshots/azure-portal-policy.svg)
+![Azure Portal Policy](docs/screenshots/azure-portal-policy.png)
 
 ### Azure Portal — Log Analytics Workspace
 
@@ -280,8 +280,8 @@ azl-bicepdeploy/
 │   ├── cicd-pipeline.svg                  # Pipeline flow diagram
 │   └── screenshots/
 │       ├── github-actions-run.svg         # Screenshot placeholder
-│       ├── azure-portal-vnet.svg          # Screenshot placeholder
-│       ├── azure-portal-policy.svg        # Screenshot placeholder
+│       ├── azure-portal-vnet.png          # Hub VNet screenshot
+│       ├── azure-portal-policy.png        # Policy assignment screenshot
 │       └── azure-portal-log-analytics.svg # Screenshot placeholder
 ├── modules/
 │   └── log-workspace.bicep                # Reusable Log Analytics module (resourceGroup scope)
