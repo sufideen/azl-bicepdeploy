@@ -266,6 +266,25 @@ A green checkmark confirms that your Bicep files compiled, passed lint, complete
 
 ---
 
+## Tearing Down
+
+The deployed resources are low-cost (an empty VNet, an unused Log Analytics workspace, and a free policy assignment — no Firewall, Bastion, or Gateway is deployed), but `scripts/teardown.sh` gives a fast way to remove them between demos:
+
+```bash
+# Preview what would be deleted (no changes made)
+./scripts/teardown.sh
+
+# Actually delete the Resource Group-scoped resources (Hub VNet, Log Analytics) and the policy assignment
+./scripts/teardown.sh --yes
+
+# Also remove the 10-node Management Group hierarchy (deploy-tenant.yml output)
+./scripts/teardown.sh --yes --include-mgmt-groups
+```
+
+Resource group deletions run with `--no-wait` (asynchronous) — check progress with `az group list` or in the Azure Portal. Requires the same `az login` / OIDC permissions used by the deploy pipelines.
+
+---
+
 ## Repository Structure
 
 ```
@@ -290,6 +309,8 @@ azl-bicepdeploy/
 │   ├── governance.bicepparam              # Params for governance.bicep
 │   ├── logging.bicepparam                 # Params for logging.bicep
 │   └── network.bicepparam                 # Params for network.bicep
+├── scripts/
+│   └── teardown.sh             # Removes deployed billable resources (dry-run by default)
 ├── bicepconfig.json            # Bicep linting rules & AVM module alias
 ├── deploy.bicep                # Tenant scope: Management Group hierarchy (10 nodes)
 ├── deploy.json                 # Legacy ARM template (superseded by deploy.bicep)
