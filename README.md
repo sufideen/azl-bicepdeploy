@@ -23,6 +23,7 @@ This blueprint spans **four distinct Azure deployment scopes**, enforcing govern
 | **Governance** | `managementGroup` | `governance.bicep` | Policy Definitions & Assignments |
 | **Shared Platform** | `resourceGroup` | `logging.bicep` | Log Analytics Workspace, Microsoft Sentinel-ready |
 | **Network Edge** | `subscription` | `network.bicep` | Hub VNet & system subnets (Firewall, Gateway, Bastion) |
+| **Monitoring & Alerting** | `resourceGroup` | `monitoring.bicep` | Action Group, Service Health alert, Cost budget, Metric alerts, Workbook |
 
 ---
 
@@ -73,6 +74,14 @@ Four subnets are provisioned with their mandatory naming conventions respected:
 
 The VNet outputs `hubVnetId` — consumed by spoke VNet peering modules in downstream workload deployments.
 
+### Monitoring & Alerting (`monitoring.bicep`)
+
+Closes the observability gap flagged in the original "Next Steps" below: a dedicated **`rg-ict-monitoring-poc`** resource group holds an **Action Group** (`ag-ict-platform-alerts`), a **Service Health Activity Log Alert** that fires on any `ServiceHealth` event for the subscription, a **Cost Budget** (`Microsoft.Consumption/budgets`) that notifies at 80% actual and 100% forecasted spend, an array-driven **resource-utilization metric alert** module (`modules/metric-alert.bicep`, empty by default — populate `resourceUtilizationAlerts` in `parameters/monitoring.bicepparam` with real target resource IDs to activate), and a tabbed **Azure Workbook** (Performance / Availability / Cost) querying the shared Log Analytics workspace.
+
+It looks up the shared workspace from `logging.bicep` via an `existing` reference rather than chaining deployment outputs, the same pattern `vm-onboarding.bicep` already uses for its target resource group.
+
+**Application Insights** is treated as a per-workload concern, not a shared platform resource — `app-insights-onboarding.bicep` (repo root) references an existing workload resource group and deploys a workspace-based Application Insights component (`modules/app-insights.bicep`) into it, linked to the same shared Log Analytics workspace. Like `vm-onboarding.bicep`, it targets infrastructure that doesn't exist reproducibly in this platform-only repo, so it's lint-only in CI.
+
 ### CI/CD Pipeline (`deploy.yml`)
 
 ![CI/CD Pipeline](docs/cicd-pipeline.svg)
@@ -83,9 +92,9 @@ Two GitHub Actions workflows handle the full ALZ deployment lifecycle:
 
 | Job | Trigger | What runs |
 |:---|:---|:---|
-| **Lint** | Every push & PR | `az bicep build` on all 5 Bicep files — no Azure credentials needed |
-| **Validate** | Every push & PR (needs Lint) | `what-if` across Management Group + both Subscription deployments |
-| **Deploy** | Push to `main` only (needs Validate) | Live: Governance Policy → Logging → Hub Network |
+| **Lint** | Every push & PR | `az bicep build` on every Bicep file in the repo — no Azure credentials needed |
+| **Validate** | Every push & PR (needs Lint) | `what-if` across Management Group + three Subscription deployments |
+| **Deploy** | Push to `main` only (needs Validate) | Live: Governance Policy → Logging → Hub Network → Monitoring & Alerting |
 
 **`deploy-tenant.yml`** — tenant-scope Management Group hierarchy (infrequent, elevated permissions):
 
@@ -148,7 +157,8 @@ This repository establishes the **platform foundation layer** of the ALZ. The fo
 - [ ] **Microsoft Sentinel** — enable on the Log Analytics workspace (`Microsoft.SecurityInsights/onboardingStates`) for SIEM/SOAR capability
 - [ ] **Defender for Cloud** — enable the Microsoft Cloud Security Benchmark (MCSB) at Management Group scope via Bicep policy assignment
 - [ ] **Policy-as-Code compliance pipeline** — add a pipeline stage to query `az policy state list` and fail the build on non-compliant resources
-- [ ] **Azure Monitor Baseline Alerts (AMBA)** — deploy the community AMBA initiative for platform-level alerting on resource health and performance
+- [x] **Baseline resource-utilization, Service Health, and cost alerting** — delivered via `monitoring.bicep` (hand-rolled `Microsoft.Insights/metricAlerts`, `activityLogAlerts`, and `Microsoft.Consumption/budgets` modules, all routed through a shared Action Group)
+- [ ] **Full AMBA (Azure Monitor Baseline Alerts) adoption** — the hand-rolled alerts above cover the same ground at small scale; adopting the community AMBA initiative's management-group-scoped Deploy-If-Not-Exists policy set for auto-provisioned, fleet-wide alerting remains open
 
 ### Networking
 - [ ] **Azure Firewall** — deploy `Microsoft.Network/azureFirewalls` into `AzureFirewallSubnet` with UDRs forcing workload egress through central inspection
@@ -159,8 +169,9 @@ This repository establishes the **platform foundation layer** of the ALZ. The fo
 ### Platform Operations
 - [ ] **Multi-environment promotion** — add `dev` and `staging` environments to the pipeline with GitHub environment protection rules and manual approval gates
 - [ ] **Bicep module registry** — publish shared modules to an Azure Container Registry for reuse and versioning across teams
-- [ ] **Cost governance** — deploy Azure Budget alerts at subscription scope via Bicep (`Microsoft.Consumption/budgets`)
+- [x] **Cost governance** — Azure Budget alerts deployed at subscription scope via Bicep (`modules/budget-alert.bicep`, `Microsoft.Consumption/budgets`), notifying at 80% actual and 100% forecasted spend
 - [ ] **Automation Account** — provision under `corp-management` for scheduled runbooks, Update Management, and DSC configuration
+- [ ] **Cost Management scheduled exports** — wire Azure Cost Management exports into the shared Log Analytics workspace so the monitoring workbook's Cost tab can run interactive KQL instead of linking out to the Cost Management blade
 
 ---
 
@@ -276,7 +287,7 @@ A green checkmark confirms that your Bicep files compiled, passed lint, complete
 azl-bicepdeploy/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml                     # 3-job pipeline: Lint → Validate → Deploy
+│       └── deploy.yml                     # 3-job pipeline: Lint → Validate → Deploy (4 stages)
 ├── docs/
 │   ├── architecture-overview.svg          # Full ALZ scope diagram
 │   ├── management-group-hierarchy.svg     # MG tree diagram
@@ -289,18 +300,29 @@ azl-bicepdeploy/
 │       ├── log-ict-poc-shared.png         # Log Analytics workspace screenshot
 │       └── log-ict-poc-shared02.png       # Log Analytics query results screenshot
 ├── modules/
-│   └── log-workspace.bicep                # Reusable Log Analytics module (resourceGroup scope)
+│   ├── log-workspace.bicep                # Reusable Log Analytics module (resourceGroup scope)
+│   ├── action-group.bicep                 # Shared alert notification target
+│   ├── service-health-alert.bicep         # Activity Log Alert on ServiceHealth events
+│   ├── budget-alert.bicep                 # Microsoft.Consumption/budgets (subscription scope)
+│   ├── metric-alert.bicep                 # Generic, array-driven resource-utilization alert
+│   ├── monitoring-workbook.bicep          # Performance/Availability/Cost tabbed workbook
+│   ├── workbook-content/
+│   │   └── platform-monitoring.workbook.json  # Workbook JSON payload
+│   └── app-insights.bicep                 # Reusable per-workload Application Insights module
 ├── parameters/
 │   ├── deploy.bicepparam                  # Params for deploy.bicep
 │   ├── governance.bicepparam              # Params for governance.bicep
 │   ├── logging.bicepparam                 # Params for logging.bicep
-│   └── network.bicepparam                 # Params for network.bicep
+│   ├── network.bicepparam                 # Params for network.bicep
+│   └── monitoring.bicepparam              # Params for monitoring.bicep
 ├── bicepconfig.json            # Bicep linting rules & AVM module alias
 ├── deploy.bicep                # Tenant scope: Management Group hierarchy (10 nodes)
 ├── deploy.json                 # Legacy ARM template (superseded by deploy.bicep)
 ├── governance.bicep            # Management Group scope: Policy assignment
 ├── logging.bicep               # Subscription scope: RG + Log Analytics Workspace
 ├── network.bicep               # Subscription scope: RG + Hub VNet & subnets
+├── monitoring.bicep            # Subscription scope: RG + Action Group, alerts, budget, workbook
+├── app-insights-onboarding.bicep  # Subscription scope: per-workload App Insights (lint-only in CI)
 ├── credential.json             # OIDC federated credential template
 ├── .env.example                # Environment variable reference (4 secrets)
 ├── SECURITY.md                 # Security policy & vulnerability reporting

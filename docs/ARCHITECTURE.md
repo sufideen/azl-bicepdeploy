@@ -18,6 +18,7 @@ Shows the complete ALZ stack: Management Group hierarchy at tenant scope, data-r
 | Governance | `managementGroup` | `governance.bicep` |
 | Shared Platform | `resourceGroup` (via subscription module) | `logging.bicep` → `modules/log-workspace.bicep` |
 | Network Edge | `subscription` | `network.bicep` |
+| Observability & Alerting | `resourceGroup` (via subscription module) | `monitoring.bicep` → `modules/{action-group,service-health-alert,budget-alert,metric-alert,monitoring-workbook}.bicep` |
 
 ---
 
@@ -59,15 +60,33 @@ Central hub VNet (`10.0.0.0/22`) with four reserved subnets. Subnet names are ma
 
 ### 4. CI/CD Pipeline Flow
 
-Three-job GitHub Actions pipeline. Lint runs without Azure credentials. Validate runs a What-If dry-run across all four deployment scopes on every push and PR. Deploy executes the live four-stage deployment only on merge to `main`.
+Three-job GitHub Actions pipeline (`deploy.yml`). Lint runs without Azure credentials. Validate runs a What-If dry-run across the Management Group and Subscription-scope stages on every push and PR (Tenant scope is handled separately by `deploy-tenant.yml`, since it needs Owner at `/`). Deploy executes the live four-stage deployment only on merge to `main`.
 
 ![CI/CD Pipeline](./cicd-pipeline.svg)
 
 | Job | Trigger | Steps |
 |:---|:---|:---|
-| **Lint** | Every push & PR | `bicep build` on all 5 Bicep files |
-| **Validate** | Every push & PR (needs Lint) | `what-if` across Tenant → MG → Sub (Logging) → Sub (Network) |
-| **Deploy** | Push to `main` only (needs Validate) | Live deploy of all 4 scopes in sequence |
+| **Lint** | Every push & PR | `bicep build` on every `.bicep` file in the repo |
+| **Validate** | Every push & PR (needs Lint) | `what-if` across MG (Governance) → Sub (Logging) → Sub (Network) → Sub (Monitoring) |
+| **Deploy** | Push to `main` only (needs Validate) | Live deploy of all four Subscription/MG stages in sequence |
+
+---
+
+### 5. Monitoring & Alerting
+
+`monitoring.bicep` (subscription scope, Stage 4) deploys into its own `rg-ict-monitoring-poc` resource group, separate from the Log Analytics Workspace's resource group — this keeps the raw telemetry store's change cadence decoupled from alerting/dashboard changes. It looks up the shared workspace deployed by `logging.bicep` via an `existing` reference (the same "reference by well-known name" pattern `vm-onboarding.bicep` uses for its target VM resource group, since this repo does not chain outputs across separate `az deployment` invocations).
+
+| Component | Bicep Module | Resource Type |
+|:---|:---|:---|
+| Action Group | `modules/action-group.bicep` | `Microsoft.Insights/actionGroups` |
+| Service Health Alert | `modules/service-health-alert.bicep` | `Microsoft.Insights/activityLogAlerts` |
+| Cost Budget | `modules/budget-alert.bicep` | `Microsoft.Consumption/budgets` |
+| Resource Utilization Alerts | `modules/metric-alert.bicep` | `Microsoft.Insights/metricAlerts` |
+| Platform Monitoring Workbook | `modules/monitoring-workbook.bicep` | `Microsoft.Insights/workbooks` |
+
+The Action Group is the single notification target for all three alert types. The Service Health alert fires on any `ServiceHealth` Activity Log event for the subscription. The budget notifies at 80% actual spend and 100% forecasted spend. Resource-utilization alerts are array-driven via the `resourceUtilizationAlerts` parameter — it defaults to an empty array so the pipeline stays green until real target resource IDs are populated, the same gating idiom `logging.bicep` uses for `deploySecurityEventsDcr`. The workbook renders three tabs (Performance, Availability, Cost) with live KQL against the shared workspace.
+
+Application Insights is treated as a per-workload concern rather than a shared platform resource — `app-insights-onboarding.bicep` (repo root) references an existing workload resource group and deploys `modules/app-insights.bicep` (workspace-based, linked to the shared Log Analytics workspace) into it. Like `vm-onboarding.bicep`, it targets infrastructure that doesn't exist reproducibly in this platform-only repo, so it is lint-only in CI rather than part of the What-If/Deploy stages.
 
 ---
 

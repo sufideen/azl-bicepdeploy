@@ -69,6 +69,30 @@ jobs:
       - name: Lint — network.bicep (Subscription)
         run: az bicep build --file ./network.bicep
 
+      - name: Lint — monitoring.bicep (Subscription)
+        run: az bicep build --file ./monitoring.bicep
+
+      - name: Lint — modules/action-group.bicep
+        run: az bicep build --file ./modules/action-group.bicep
+
+      - name: Lint — modules/service-health-alert.bicep
+        run: az bicep build --file ./modules/service-health-alert.bicep
+
+      - name: Lint — modules/budget-alert.bicep
+        run: az bicep build --file ./modules/budget-alert.bicep
+
+      - name: Lint — modules/metric-alert.bicep
+        run: az bicep build --file ./modules/metric-alert.bicep
+
+      - name: Lint — modules/monitoring-workbook.bicep
+        run: az bicep build --file ./modules/monitoring-workbook.bicep
+
+      - name: Lint — modules/app-insights.bicep
+        run: az bicep build --file ./modules/app-insights.bicep
+
+      - name: Lint — app-insights-onboarding.bicep (Subscription)
+        run: az bicep build --file ./app-insights-onboarding.bicep
+
 # ── Job 2: Validate (What-If) ─────────────────────────────────────────────────
 # Dry-run across Management Group and Subscription scopes.
 # Tenant scope is excluded — requires Owner at / (see deploy-tenant.yml).
@@ -115,9 +139,17 @@ jobs:
             --parameters ./parameters/network.bicepparam \
             --no-prompt
 
+      - name: "What-If — Stage 4: Monitoring & Alerting (Subscription)"
+        run: |
+          az deployment sub what-if \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./monitoring.bicep \
+            --parameters ./parameters/monitoring.bicepparam \
+            --no-prompt
+
 # ── Job 3: Deploy ─────────────────────────────────────────────────────────────
 # Live deployment — runs ONLY on push/merge to main (not on PRs).
-# Stages are sequential: Management Group → Subscription (Logging) → Subscription (Network).
+# Stages are sequential: Management Group → Subscription (Logging) → Subscription (Network) → Subscription (Monitoring).
   deploy:
     name: "Deploy ALZ"
     needs: validate
@@ -164,4 +196,13 @@ jobs:
             --location ${{ env.AZURE_REGION }} \
             --template-file ./network.bicep \
             --parameters ./parameters/network.bicepparam \
+            --no-prompt
+
+      - name: "Stage 4 — Deploy Monitoring & Alerting (Subscription)"
+        run: |
+          az deployment sub create \
+            --name "alz-monitoring-${{ github.run_number }}" \
+            --location ${{ env.AZURE_REGION }} \
+            --template-file ./monitoring.bicep \
+            --parameters ./parameters/monitoring.bicepparam \
             --no-prompt

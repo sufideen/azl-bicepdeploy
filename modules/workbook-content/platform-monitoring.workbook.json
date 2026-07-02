@@ -1,0 +1,204 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# ALZ Platform Monitoring\nPerformance, Availability, and Cost visualizations against the shared Log Analytics workspace. Use the tabs below to switch views."
+      },
+      "name": "text - title"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "selected-tab-param",
+            "version": "KqlParameterItem/1.0",
+            "name": "selectedTab",
+            "type": 1,
+            "isRequired": true,
+            "value": "performance",
+            "typeSettings": {
+              "additionalResourceOptions": []
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - selectedTab"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "tab-performance",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Performance",
+            "subTarget": "performance",
+            "style": "link"
+          },
+          {
+            "id": "tab-availability",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Availability",
+            "subTarget": "availability",
+            "style": "link"
+          },
+          {
+            "id": "tab-cost",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Cost",
+            "subTarget": "cost",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - tabs"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "### Performance\nCPU and memory trends for onboarded VMs. Populated once a Data Collection Rule with performance counters is associated (see `modules/vm-monitoring-onboarding.bicep`) — the current DCR ships Windows Security Events only, so these charts are empty until a perf-counter DCR is added."
+            },
+            "name": "text - performance-note"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Perf\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize avg(CounterValue) by bin(TimeGenerated, 5m), Computer\n| render timechart",
+              "size": 0,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "__WORKSPACE_RESOURCE_ID__"
+              ],
+              "visualization": "timechart"
+            },
+            "name": "query - cpu-utilization"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Perf\n| where ObjectName == \"Memory\" and CounterName == \"Available MBytes\"\n| summarize avg(CounterValue) by bin(TimeGenerated, 5m), Computer\n| render timechart",
+              "size": 0,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "__WORKSPACE_RESOURCE_ID__"
+              ],
+              "visualization": "timechart"
+            },
+            "name": "query - memory-available"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "performance"
+      },
+      "name": "group - performance"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "### Availability\nAzure Service Health events for this subscription, plus VM heartbeat as an infrastructure availability proxy. For per-application availability (uptime tests, request success rate), onboard Application Insights via `app-insights-onboarding.bicep` — its workspace-based telemetry lands in this same workspace and becomes queryable here."
+            },
+            "name": "text - availability-note"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "AzureActivity\n| where CategoryValue == \"ServiceHealth\"\n| project TimeGenerated, ResourceGroup, OperationNameValue, ActivityStatusValue, Properties\n| order by TimeGenerated desc\n| take 100",
+              "size": 0,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "__WORKSPACE_RESOURCE_ID__"
+              ],
+              "visualization": "table"
+            },
+            "name": "query - service-health-events"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Heartbeat\n| summarize LastHeartbeat = max(TimeGenerated) by Computer\n| extend MinutesSinceLastHeartbeat = datetime_diff('minute', now(), LastHeartbeat)\n| project Computer, LastHeartbeat, MinutesSinceLastHeartbeat\n| order by MinutesSinceLastHeartbeat desc",
+              "size": 0,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "__WORKSPACE_RESOURCE_ID__"
+              ],
+              "visualization": "table"
+            },
+            "name": "query - vm-heartbeat"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "availability"
+      },
+      "name": "group - availability"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "### Cost\nA subscription budget (see `modules/budget-alert.bicep`) alerts the platform team at 80% actual spend and 100% forecasted spend. Interactive cost-by-resource KQL requires enabling [Cost Management scheduled exports](https://learn.microsoft.com/azure/cost-management-billing/costs/tutorial-export-acm-data) into this workspace — tracked as a follow-up, not yet configured. Until then, use the link below for full cost detail."
+            },
+            "name": "text - cost-note"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "[Open Cost Management + Billing](https://portal.azure.com/#view/Microsoft_Azure_CostManagement/Menu/~/costanalysis)"
+            },
+            "name": "text - cost-link"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "cost"
+      },
+      "name": "group - cost"
+    }
+  ],
+  "styleSettings": {},
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
