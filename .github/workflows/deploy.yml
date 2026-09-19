@@ -9,6 +9,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Run the live deployment after validation (needs Azure OIDC secrets and approval)"
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -70,11 +76,14 @@ jobs:
         run: az bicep build --file ./network.bicep
 
 # ── Job 2: Validate (What-If) ─────────────────────────────────────────────────
-# Dry-run across Management Group and Subscription scopes.
+# Dry-run across Management Group and Subscription scopes. Runs on pull requests
+# and manual runs. Pushes to main run the credential-free lint job only, so the
+# repository badge reflects code validity rather than the state of a live tenant.
 # Tenant scope is excluded — requires Owner at / (see deploy-tenant.yml).
   validate:
     name: "What-If Validation"
     needs: lint
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -116,12 +125,13 @@ jobs:
             --no-prompt
 
 # ── Job 3: Deploy ─────────────────────────────────────────────────────────────
-# Live deployment — runs ONLY on push/merge to main (not on PRs).
+# Live deployment — runs ONLY when started manually (Run workflow, deploy = true)
+# on main, after validation, and behind the `production` environment approval.
 # Stages are sequential: Management Group → Subscription (Logging) → Subscription (Network).
   deploy:
     name: "Deploy ALZ"
     needs: validate
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy
     runs-on: ubuntu-latest
     environment: production
     steps:
